@@ -18,11 +18,15 @@ DISTANCE_SQL = """(6371::FLOAT8 * 2::FLOAT8 * asin(sqrt(
     power(sin(radians(lon - %(near_lon)s::FLOAT8) / 2::FLOAT8), 2::FLOAT8)
 )))"""
 
-# Year-long programmes ("Du 1er janvier au 31 décembre") would otherwise crowd out concerts and
-# shows. Short, dated events come first; long-running ones follow, ordered the same way.
+# What people want first is "what starts soon". Ranking, most important first:
+#   1. short events before long-running programmes ("Du 1er janvier au 31 décembre")
+#   2. events starting inside the window before ones that were already running when it opened
+#   3. soonest start first
+# Uses the same %(date_from)s parameter as the WHERE clause (NULL means "now").
 DATE_ORDER = """
     (ends_at - starts_at > INTERVAL '14 days'),
-    GREATEST(starts_at, now()), starts_at, id
+    (starts_at < COALESCE(%(date_from)s, now())),
+    starts_at, id
 """
 
 

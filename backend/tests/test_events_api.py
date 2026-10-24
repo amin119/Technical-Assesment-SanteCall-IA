@@ -34,6 +34,17 @@ async def test_events_sorted_soonest_first_with_long_programmes_last(
     assert await _ids(client) == ["soon", "later", "year-long"]
 
 
+async def test_events_starting_in_the_window_come_before_ones_already_running(
+    pool: AsyncConnectionPool, client: AsyncClient
+) -> None:
+    await seed(
+        pool,
+        raw_record("running", **_at(-2, hours=24 * 5)),  # started 2 days ago, ends in 3
+        raw_record("upcoming", **_at(2)),
+    )
+    assert await _ids(client) == ["upcoming", "running"]
+
+
 async def test_filter_by_category_and_counts_ignore_the_category_filter(
     pool: AsyncConnectionPool, client: AsyncClient
 ) -> None:
