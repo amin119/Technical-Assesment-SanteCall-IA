@@ -1,0 +1,306 @@
+/* Masthead and hero */
+.masthead {
+  padding-block: 22px 0;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 30px;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.wordmark span {
+  color: var(--accent);
+}
+
+.hero {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: clamp(36px, 7vw, 84px) var(--gutter) 28px;
+}
+
+.hero__date {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 14px;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(44px, 8.4vw, 118px);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  max-width: 14ch;
+}
+
+.hero__swap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+.hero__swap em {
+  display: inline-block;
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero__count {
+  margin-top: 18px;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+/* Filters */
+.filters {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: 18px var(--gutter) 22px;
+  border-block: 1px solid var(--line);
+  display: grid;
+  gap: 16px;
+}
+
+.filters__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 40px;
+  flex-wrap: wrap;
+}
+
+.filters__note {
+  font-size: 13px;
+  color: var(--accent-ink);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 360px);
+  border-bottom: 1px solid var(--ink);
+  color: var(--ink-2);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px 0;
+  color: var(--ink);
+  outline: none;
+}
+
+.search:focus-within {
+  border-bottom-color: var(--accent-ink);
+  box-shadow: 0 1px 0 var(--accent-ink);
+}
+
+.search input::placeholder {
+  color: var(--ink-2);
+}
+
+.when {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.when__tab {
+  position: relative;
+  padding: 8px 0;
+  font-size: 15px;
+  color: var(--ink-2);
+  transition: color 0.2s;
+}
+
+.when__tab:hover,
+.when__tab[aria-pressed='true'] {
+  color: var(--ink);
+}
+
+.when__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+}
+
+.cat {
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+  transition:
+    color 0.2s,
+    text-decoration-color 0.2s;
+}
+
+.cat sup {
+  font-size: 10px;
+  margin-left: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cat:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.cat[aria-pressed='true'] {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration-color: var(--accent);
+}
+
+.cat:disabled {
+  opacity: 0.35;
+}
+
+.toggles {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  padding: 6px 14px;
+  font-size: 13px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.toggle:hover:not(:disabled) {
+  background: var(--paper-2);
+}
+
+.toggle[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.toggle--link {
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Results and map split */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 48px);
+  align-items: start;
+  padding-top: 8px;
+}
+
+.footer {
+  padding-block: 56px 72px;
+  color: var(--ink-2);
+  font-size: 13px;
+  max-width: calc(var(--max));
+}
+
+.footer p {
+  max-width: 62ch;
+}
+
+/* Shared: buttons, empty and error states */
+.btn {
+  background: var(--accent-ink);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--ink);
+}
+
+.btn:disabled {
+  background: var(--line);
+  color: var(--ink-2);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.state {
+  padding: 72px 0;
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+}
+
+.state p {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+/* Mobile: one column, list/map switch */
+.viewtoggle {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .split {
+    /* minmax(0, ...) lets the column shrink below its content width; plain 1fr would not. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .split--list .mapwrap,
+  .split--map .results {
+    display: none;
+  }
+
+  .viewtoggle {
+    display: block;
+    position: fixed;
+    z-index: 30;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 28px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .when {
+    gap: 18px;
+  }
+}

@@ -1,0 +1,16 @@
+:root {
+  --paper: #f4f0e8;
+  --paper-2: #ebe5d9;
+  --ink: #17140f;
+  --ink-2: #6b655a;
+  --line: #d9d2c3;
+  --accent: #e0452b; /* large shapes: map dot, underline */
+  --accent-ink: #b8321b; /* the same red, dark enough for small text and buttons (AA contrast) */
+
+  --font-display: 'Instrument Serif', 'Times New Roman', serif;
+  --font-text: 'Hanken Grotesk Variable', 'Hanken Grotesk', system-ui, sans-serif;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --gutter: clamp(20px, 4vw, 56px);
+  --max: 1480px;
+}
