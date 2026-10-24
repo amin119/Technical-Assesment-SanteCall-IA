@@ -1,0 +1,50 @@
+# One command runs everything:  docker compose up --build   →  http://localhost:8080
+services:
+  cockroach:
+    image: cockroachdb/cockroach:v25.4.18
+    command: start-single-node --insecure --store=type=mem,size=25%
+    # In-memory store: fast and always clean for a demo. For persistence, replace with a volume:
+    #   command: start-single-node --insecure
+    #   volumes: [cockroach-data:/cockroach/cockroach-data]
+    ports:
+      - "26257:26257" # SQL
+      - "8081:8080"   # admin UI → http://localhost:8081
+    healthcheck:
+      test: ["CMD", "cockroach", "sql", "--insecure", "-e", "SELECT 1"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    environment:
+      SORTIR_DATABASE_URL: postgresql://root@cockroach:26257/defaultdb?sslmode=disable
+    depends_on:
+      cockroach:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/api/health')"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  # Runs once: pulls events from Paris Open Data, then exits.
+  ingest:
+    build: ./backend
+    command: ["python", "-m", "app.ingest"]
+    environment:
+      SORTIR_DATABASE_URL: postgresql://root@cockroach:26257/defaultdb?sslmode=disable
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: "no"
+
+  web:
+    build: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8080:80"
