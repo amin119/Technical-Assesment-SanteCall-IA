@@ -6,19 +6,24 @@ description: Commit conventions, CI expectations and documentation style. Use wh
 # Git, CI and docs
 
 ## Commits
-- Small and focused: one idea per commit. Imperative subject, max ~60 chars: `Add event filters`.
-- Body (optional) explains *why*, not what.
-- Run lint + tests before committing. Never commit `.env`, `node_modules`, `.venv`.
-- Do not push or open PRs unless the user asks.
+- Small and focused: one idea per commit. Imperative subject under 60 characters: `Add event filters`.
+- The body (optional) explains *why*, not what.
+- Run the checks first: backend `uv run ruff check . && uv run ruff format --check . && uv run pytest`,
+  frontend `npm run lint && npm run typecheck && npm test && npm run build`.
+- Never commit `.env`, `node_modules`, `.venv`, `dist`.
+- Do not push or open pull requests unless the user asks.
 
 ## CI (`.github/workflows/ci.yml`)
-- `backend`: CockroachDB service container, `uv sync --frozen`, ruff, pytest.
+- `backend`: a CockroachDB service container, `uv sync --frozen`, ruff, pytest.
 - `frontend`: `npm ci`, lint, typecheck, test, build.
-- `docker`: build both images (no push).
+- `docker`: build the images. It only runs when the other two pass.
+- A change to CI must be runnable locally with the commands above.
 
-## Writing docs
-Reader = a smart engineer who has never seen this repo and has 5 minutes.
-- Start with what it does and how to run it (3 commands).
-- Short sentences. Define a term the first time. Prefer a table or a small diagram to a paragraph.
-- Always answer "why this choice, and what did we reject?". That is what the interview will probe.
-- Be honest about limits and next steps. Never oversell.
+## Docs
+Reader: a smart engineer who has never seen this repo and has 5 minutes.
+- Lead with what it does and how to run it.
+- Short sentences. Define a term the first time it appears. Prefer a table or diagram to a paragraph.
+- Always answer "why this choice, and what did we reject?". That is what an interview probes.
+- Be honest about limits. Never state a number you did not measure.
+- Update `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` in the same commit as the change they describe.
+- Docs are English. The product UI is French.

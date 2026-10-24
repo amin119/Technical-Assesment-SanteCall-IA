@@ -29,5 +29,17 @@ goal, Next.js is the natural migration (listed in the roadmap).
 - Plain CSS with custom properties (tokens). No CSS framework, no UI kit.
 - UI text is French. Code, comments and docs are English.
 
+## Gotchas
+- **Keep render pure.** No `new Date()` or `Date.now()` during render (oxlint flags it). The URL-state
+  hook stores a `stamp` when filters change, and "today" is derived from it.
+- **No `setState` inside an effect to mirror props.** Adjust state during render (compare to the
+  previous prop) or derive the value.
+- **A debounced handler must read the latest callback** (a ref), not the one captured at keystroke time.
+- **Single-column grids need `minmax(0, 1fr)`**, or long content stretches the page sideways.
+- **Map tiles:** CARTO's free tiles need an API key now. We use OpenStreetMap tiles muted by a CSS
+  filter. Production needs a tile provider.
+- **Headless browsers enforce a minimum viewport (about 500px).** Screenshot mobile at 500, not 390.
+- Leaflet is lazy-loaded (`React.lazy`) so it stays out of the first bundle.
+
 ## Before committing
 `npm run lint && npm run typecheck && npm test && npm run build`

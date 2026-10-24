@@ -16,7 +16,7 @@ both succeed. That is the technical heart of the project.
 | Frontend   | React + Vite + TypeScript    | A SPA is enough (no SEO need). Simple, fast dev loop. |
 | Data fetch | TanStack Query               | Caching, dedupe, cancellation, retries without hand-written effects. |
 | Animation  | motion (framer-motion)       | Layout animations and shared-element transitions. |
-| Map        | Leaflet + OpenStreetMap      | Free, no API key. |
+| Map        | Leaflet + OpenStreetMap      | Free, no API key (tiles muted with a CSS filter). |
 | Deploy     | Docker Compose, GitHub Actions | `docker compose up` runs everything. |
 
 ## Commands
@@ -53,6 +53,17 @@ docs/               ARCHITECTURE.md, DECISIONS.md
 .claude/skills/     project rules (read the relevant one before editing)
 ```
 
+## Skills (read the relevant one before editing)
+
+| Skill | Use it when |
+|-------|-------------|
+| `system-design` | adding a service, table, job, cache, or changing how parts connect. Also when updating `docs/ARCHITECTURE.md`. |
+| `concurrency-cockroachdb` | touching `bookings/`, `db.py`, `schema.sql` or the concurrency tests |
+| `backend-fastapi` | any change under `backend/` (includes gotchas) |
+| `frontend-react` | any change under `frontend/` (includes gotchas) |
+| `design-system` | any CSS, markup or animation |
+| `git-and-docs` | committing, CI, README and docs |
+
 ## Golden rules
 
 1. **Never break the booking invariant**: `seats_taken <= capacity`, one booking per (event, email).
@@ -64,6 +75,9 @@ docs/               ARCHITECTURE.md, DECISIONS.md
 6. Every behaviour change ships with a test. Concurrency tests run against a real CockroachDB, never mocks.
 7. Docs are for a newcomer: short sentences, say *why*, no jargon without a definition.
 8. Small commits, imperative messages (`Add ...`, `Fix ...`). Run lint + tests first.
+9. Verify against the real thing: real CockroachDB for SQL, a real browser for UI. Passing types and
+   mocks is not proof. Never claim a number that was not measured.
+10. Structural changes update `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` in the same commit.
 
 ## Honest limits (say these out loud in the interview)
 

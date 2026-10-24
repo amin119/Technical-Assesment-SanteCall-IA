@@ -34,5 +34,16 @@ Codes used: `event_not_found`, `sold_out`, `already_booked`, `busy`, `validation
 - Unit tests for pure code, integration tests through `httpx.AsyncClient` + `ASGITransport`.
 - Each test starts from empty tables (fixture truncates).
 
+## Gotchas (each one cost time once)
+- **CockroachDB is stricter than Postgres about types.** `6371.0` is a DECIMAL, so `DECIMAL * FLOAT8`
+  fails. Cast constants explicitly (`6371::FLOAT8`). Test every new SQL expression against the real DB.
+- **`ON CONFLICT ON CONSTRAINT` is not supported.** Use `ON CONFLICT (col, col)`.
+- **ODSQL (Paris Open Data) rejects `now()+90d`.** Compute dates in Python and pass `date'...'`.
+- **Windows:** psycopg async cannot use the default `ProactorEventLoop`. `app/__init__.py` selects the
+  selector loop for scripts and tests. For uvicorn use `--reload` (it uses the selector loop).
+- **Pool errors are swallowed.** `pool.open(wait=True)` only reports "PoolTimeout". Connect once with
+  `psycopg.AsyncConnection.connect` to see the real error.
+- **Ordering must be deterministic** (`..., starts_at, id`), or paging can skip or repeat rows.
+
 ## Before committing
 `uv run ruff check . && uv run ruff format . && uv run pytest`
