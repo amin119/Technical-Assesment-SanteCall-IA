@@ -28,6 +28,8 @@ Ouvrez **http://localhost:8080**. Au premier démarrage, les événements sont i
 
 Le site et l'API se déploient sur Vercel, avec une base CockroachDB Cloud (essai gratuit). Guide pas à pas : [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md).
 
+**Site en ligne : https://sortir-paris-lac.vercel.app**
+
 ## Le point technique central : deux personnes, une dernière place
 
 Quand deux personnes réservent la dernière place au même instant, **une seule** l'obtient. Jamais les deux.

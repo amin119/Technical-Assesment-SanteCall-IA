@@ -119,6 +119,8 @@ vercel env add SORTIR_DATABASE_URL production     # collez l'adresse quand on vo
 vercel deploy --prod
 ```
 
+> **Réglages qui comptent dans `vercel.json`.** `"framework": null` : sans cela, Vercel détecte « FastAPI » et envoie `/api/index` à l'application au lieu du vrai chemin (erreur 404). Pas d'`installCommand` : un `installCommand` remplace l'installation des paquets Python, et la fonction plante avec `No module named 'fastapi'`.
+
 ## Étape 4. Vérifier
 
 Remplacez `votre-site` par l'adresse donnée par Vercel :
@@ -134,6 +136,8 @@ Puis ouvrez le site : la liste, la carte, les filtres, la pagination et une rés
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
+| `FUNCTION_INVOCATION_FAILED` et, dans les journaux, `No module named 'fastapi'` | Les paquets Python n'ont pas été installés (un `installCommand` ou un réglage du projet remplace l'installation) | Retirez `installCommand` de `vercel.json` et, dans les réglages du projet, laissez « Install Command » vide. |
+| `/api/health` répond 404 | Vercel a détecté le framework « FastAPI » | Gardez `"framework": null` dans `vercel.json` (et « Other » dans les réglages du projet). |
 | `/api/health` répond 500 | L'adresse de la base est absente ou fausse | Vérifiez `SORTIR_DATABASE_URL` dans les variables d'environnement, puis redéployez. |
 | Erreur de certificat SSL (`root certificate file does not exist` ou `certificate verify failed`) | Le certificat du cluster n'est pas dans le projet | Refaites l'étape 1.4 : le fichier doit être `backend/app/certs/cockroach-ca.crt`, puis redéployez. |
 | `password authentication failed` | Mot de passe faux ou mal encodé | Réinitialisez le mot de passe dans la console, encodez les caractères spéciaux. |
@@ -145,5 +149,5 @@ Puis ouvrez le site : la liste, la carte, les filtres, la pagination et une rés
 
 - **Ce n'est pas gratuit pour toujours.** Une nouvelle organisation reçoit 400 $ de crédits d'essai. Un cluster Basic profite ensuite d'un crédit mensuel de 15 $ (environ 50 millions d'unités de requêtes et 10 Gio de stockage), mais **seulement si une carte bancaire est enregistrée**. Sans carte, à la fin de l'essai les clusters sont ralentis pendant 30 jours, puis **supprimés sans retour possible**. Pour une démonstration d'entretien, l'essai suffit : pensez à ajouter une carte, ou à exporter les données, avant la fin. Source : [free-trial](https://docs.cockroachlabs.com/docs/cockroachcloud/free-trial).
 - La base se recrée facilement : `uv run python -m app.ingest` recharge tout en 30 secondes. Seules les réservations de démonstration seraient perdues.
-- Je n'ai pas mesuré les performances sur Vercel : la démonstration de concurrence a été mesurée en local (voir le README).
+- **Mesuré en ligne :** la démonstration de concurrence a été lancée contre le site déployé (`uv run python -m app.demo.race https://sortir-paris-lac.vercel.app`) : 100 clics simultanés sur 10 places donnent 10 réservations et 90 « complet », la base est d'accord, et le serveur a relancé 29 transactions en conflit. La réponse a pris environ 4,5 s, car chaque requête ouvre sa connexion et la première démarre une fonction. C'est plus lent qu'en local (environ 1 s), ce qui est le prix des connexions courtes.
 - L'import est manuel. Pour le planifier : une tâche GitHub Actions avec `schedule`, qui lance `python -m app.ingest` avec l'adresse de la base en secret.
