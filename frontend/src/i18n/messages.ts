@@ -14,10 +14,12 @@ export const fr = {
 
   'hero.before': 'Que faire à Paris ',
   'hero.after': ' ?',
+  'hero.lede': 'Concerts, expositions, théâtre et sport, d’après les données ouvertes de la Ville de Paris.',
   'hero.count_one': '{n} événement',
   'hero.count_other': '{n} événements',
 
   'when.group': 'Quand',
+  'filters.label': 'Filtres',
   'when.all': 'Tout',
   'when.today': "Aujourd'hui",
   'when.tomorrow': 'Demain',
@@ -53,6 +55,10 @@ export const fr = {
   'list.loading': 'Chargement des événements',
   'list.more': 'Voir plus',
   'list.loadingMore': 'Chargement…',
+  'list.byDistance': 'les plus proches d’abord',
+  'card.reserve': 'Réserver',
+  'map.places_one': '{n} lieu',
+  'map.places_other': '{n} lieux',
 
   'state.listError': 'Impossible de charger les événements.',
   'state.retry': 'Réessayer',
@@ -63,8 +69,15 @@ export const fr = {
   'view.map': 'Carte',
   'view.list': 'Liste',
 
-  'footer.note':
-    'Données : Paris Data, « Que faire à Paris ». Les places et réservations sont une démonstration technique : les capacités sont fictives.',
+  'footer.tagline': 'Concerts, expositions, théâtre et sport à Paris, au même endroit.',
+  'footer.dataTitle': 'Données',
+  'footer.dataSource': 'Paris Data, « Que faire à Paris »',
+  'footer.mapSource': 'Fond de carte © OpenStreetMap',
+  'footer.frenchText': 'Les titres et descriptions sont publiés en français par la Ville de Paris.',
+  'footer.demoTitle': 'À propos de cette démo',
+  'footer.demoNote':
+    'Les capacités et les réservations sont fictives. Elles servent à montrer qu’une dernière place ne peut jamais être vendue deux fois.',
+  'footer.code': 'Code source',
 
   'row.until': 'jusqu’au',
   'price.free': 'Gratuit',
@@ -113,10 +126,12 @@ export const en: Record<MessageKey, string> = {
 
   'hero.before': 'What to do in Paris ',
   'hero.after': '?',
+  'hero.lede': 'Concerts, exhibitions, theatre and sport, from the City of Paris open data.',
   'hero.count_one': '{n} event',
   'hero.count_other': '{n} events',
 
   'when.group': 'When',
+  'filters.label': 'Filters',
   'when.all': 'All',
   'when.today': 'Today',
   'when.tomorrow': 'Tomorrow',
@@ -152,6 +167,10 @@ export const en: Record<MessageKey, string> = {
   'list.loading': 'Loading events',
   'list.more': 'Show more',
   'list.loadingMore': 'Loading…',
+  'list.byDistance': 'nearest first',
+  'card.reserve': 'Reserve',
+  'map.places_one': '{n} place',
+  'map.places_other': '{n} places',
 
   'state.listError': 'Couldn’t load events.',
   'state.retry': 'Try again',
@@ -162,8 +181,15 @@ export const en: Record<MessageKey, string> = {
   'view.map': 'Map',
   'view.list': 'List',
 
-  'footer.note':
-    'Data: Paris Data, “Que faire à Paris”. Event titles and descriptions are in French, as published. Seats and reservations are a technical demo: capacities are fictional.',
+  'footer.tagline': 'Concerts, exhibitions, theatre and sport in Paris, in one place.',
+  'footer.dataTitle': 'Data',
+  'footer.dataSource': 'Paris Data, “Que faire à Paris”',
+  'footer.mapSource': 'Map © OpenStreetMap',
+  'footer.frenchText': 'Titles and descriptions are published in French by the City of Paris.',
+  'footer.demoTitle': 'About this demo',
+  'footer.demoNote':
+    'Capacities and reservations are fictional. They show that the last seat can never be sold twice.',
+  'footer.code': 'Source code',
 
   'row.until': 'until',
   'price.free': 'Free',

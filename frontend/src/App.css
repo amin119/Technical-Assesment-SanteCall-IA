@@ -1,0 +1,67 @@
+/* Page layout: results on the left (7/12), a sticky map on the right (5/12). */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.results__count {
+  min-height: 1.5em;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--edge);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-600);
+}
+
+.split__map {
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+  height: min(calc(100dvh - var(--header-h) - 32px), 760px);
+}
+
+.btn.viewtoggle {
+  /* Only for small screens. `.btn` sets display too, so this needs the extra class to win. */
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .split {
+    /* minmax(0, ...) lets the column shrink below its content width; plain 1fr would not. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .split--list .split__map,
+  .split--map .results {
+    display: none;
+  }
+
+  .split__map {
+    position: relative;
+    top: 0;
+    height: calc(100dvh - var(--header-h) - 120px);
+    min-height: 360px;
+  }
+
+  .btn.viewtoggle {
+    display: inline-flex;
+    position: fixed;
+    z-index: 40;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    min-height: 44px;
+    padding-inline: 22px;
+    border-radius: var(--radius-pill);
+    background: var(--ink-900);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .btn.viewtoggle:hover:not(:disabled) {
+    background: var(--ink-700);
+  }
+}

@@ -16,6 +16,7 @@ both succeed. That is the technical heart of the project.
 | Frontend   | React + Vite + TypeScript    | A SPA is enough (no SEO need). Simple, fast dev loop. |
 | Data fetch | TanStack Query               | Caching, dedupe, cancellation, retries without hand-written effects. |
 | Animation  | motion (framer-motion)       | Layout animations and shared-element transitions. |
+| Look       | Plain CSS tokens, Plus Jakarta Sans + Newsreader | Design from Google Stitch, rebuilt as reusable components. No CSS framework. |
 | Languages  | own typed FR/EN layer        | ~100 strings, two languages. Missing keys fail the build. |
 | Map        | Leaflet + OpenStreetMap      | Free, no API key (tiles muted with a CSS filter). |
 | Deploy     | Docker Compose, GitHub Actions | `docker compose up` runs everything. |
@@ -49,7 +50,7 @@ backend/app/        main.py, config.py, db.py (pool + retry), schema.sql
   ingest/           client (HTTP), normalize (pure functions), runner (upsert)
   demo/race.py      concurrency demo
 backend/tests/
-frontend/src/       api/, components/, hooks/, i18n/, lib/, styles/
+frontend/src/       api/, components/ (ui, layout, filters, events, drawer, map), hooks/, i18n/, lib/, styles/
 docs/               ARCHITECTURE.md, DECISIONS.md
 .claude/skills/     project rules (read the relevant one before editing)
 ```
@@ -72,7 +73,7 @@ docs/               ARCHITECTURE.md, DECISIONS.md
 2. Use `uv`, never `pip`. Add deps with `uv add`, never edit `uv.lock` by hand.
 3. Raw parameterised SQL only. Never format values into SQL strings.
 4. Never render third-party HTML. Ingestion converts HTML to plain text.
-5. UI follows `.claude/skills/design-system/SKILL.md`. No new colors/fonts outside the tokens.
+5. UI follows `.claude/skills/design-system/SKILL.md`. No new colors/fonts outside the tokens. Reuse the `components/ui` primitives.
    All user-facing text goes through `src/i18n/messages.ts` in French **and** English. No hard-coded strings.
 6. Every behaviour change ships with a test. Concurrency tests run against a real CockroachDB, never mocks.
 7. Docs are for a newcomer: short sentences, say *why*, no jargon without a definition.

@@ -10,9 +10,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-text);
+  background: var(--porcelain);
+  color: var(--ink-900);
+  font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -20,11 +20,17 @@ body {
 
 h1,
 h2,
+h3,
 p,
 ul,
 dl,
 dd {
   margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
 }
 
 button,
@@ -49,13 +55,13 @@ a {
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--paper);
+  background: var(--cobalt-100);
+  color: var(--cobalt-700);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent-ink);
-  outline-offset: 3px;
+  outline: 2px solid var(--cobalt-600);
+  outline-offset: 2px;
 }
 
 .sr-only {
@@ -73,6 +79,12 @@ a {
   padding-inline: var(--gutter);
 }
 
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -80,5 +92,6 @@ a {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

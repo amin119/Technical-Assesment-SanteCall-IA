@@ -1,0 +1,85 @@
+.mappanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mappanel__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--edge);
+  background: rgb(241 245 249 / 0.5);
+}
+
+.mappanel__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mappanel__title svg {
+  color: var(--cobalt-600);
+}
+
+.mappanel__count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-500);
+}
+
+.mappanel__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+  font-family: var(--font-sans);
+}
+
+.leaflet-container {
+  background: var(--subtle);
+  font-family: var(--font-sans);
+}
+
+/* OpenStreetMap's standard tiles are colourful. Mute them so the map sits quietly in the page
+   and the event dots are what you see. */
+.leaflet-tile-pane {
+  filter: grayscale(1) contrast(0.88) brightness(1.06);
+  opacity: 0.85;
+}
+
+.leaflet-tooltip {
+  background: var(--ink-900);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 240px;
+  white-space: normal;
+}
+
+.leaflet-tooltip-top::before {
+  border-top-color: var(--ink-900);
+}
+
+.leaflet-control-attribution {
+  background: rgb(255 255 255 / 0.85) !important;
+  font-size: 10px;
+}

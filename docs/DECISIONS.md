@@ -61,7 +61,7 @@ Each entry: what we chose, why, and what we gave up. Short on purpose.
 | motion | Layout animations and shared-underline transitions that are hard to hand-write | Hand-written CSS keyframes for everything |
 | Leaflet + OpenStreetMap | Free, no API key | Google Maps (key, billing). Mapbox (key) |
 | Plain CSS with tokens | Full control of the look. Few dependencies. | Tailwind or a UI kit, which tend to look generic |
-| Self-hosted fonts (`@fontsource`) | No third-party request, no tracking, works offline | Google Fonts link |
+| Self-hosted fonts (`@fontsource-variable`: Plus Jakarta Sans, Newsreader) | No third-party request, no tracking, works offline | Google Fonts link |
 
 Note on map tiles: the standard OpenStreetMap tile server is fine for a demo but has a usage policy. Production should use a tile provider or self-hosted tiles. (CARTO's free tiles now require an API key, which we found while testing.)
 
@@ -103,3 +103,13 @@ It is not part of the API process. API restarts never trigger a heavy import, a 
 **What is not translated, on purpose.** Event titles and descriptions come from Paris Open Data in French. Machine-translating third-party text would risk wrong information (dates, prices), so we show it as published and mark it `lang="fr"` so screen readers pronounce it correctly. The English footer says so.
 
 **Cost.** Adding a third language means one more message file and one more entry in `LANGS`. Right-to-left languages would also need layout work.
+
+## 12. Visual design from Google Stitch, rebuilt as components
+
+**Chosen.** The first look (cream paper, red accent, hairline list) was replaced by a design generated in Google Stitch from a written brief (`docs/design-brief-stitch.md`): porcelain page, white cards with cover images, one cobalt accent, a serif headline, a sticky map.
+
+**How we used it.** Stitch outputs one HTML file styled with Tailwind. We did not paste it. We kept the look and rebuilt it as typed React components on our design tokens: `ui/` primitives (`Button`, `Chip`, `Segmented`, `Switch`, `Badge`, `StateMessage`, `Icon`) and feature folders. The language switch and the date filter share the same `Segmented` component, so there is one implementation of "choose one".
+
+**What we left out of the mock-up, on purpose.** A top navigation with pages that do not exist, a newsletter button, an account icon, a bookmark button, an `.ics` export, a fake "live" indicator and an invented editor's note. Showing controls that do nothing would be dishonest in a demo. They are listed as ideas, not shipped.
+
+**Cost.** Tailwind was not adopted, so the design had to be translated by hand into tokens and classes. In return the repository has no CSS build dependency and each component's styles sit beside it.

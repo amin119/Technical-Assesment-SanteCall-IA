@@ -1,0 +1,102 @@
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding-block: 8px 24px;
+}
+
+.filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.search {
+  position: relative;
+  flex: 1 1 300px;
+  max-width: 520px;
+  color: var(--ink-400);
+}
+
+.search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px 0 42px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink-900);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search input::placeholder {
+  color: var(--ink-500);
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--cobalt-600);
+  box-shadow: 0 0 0 3px var(--cobalt-100);
+}
+
+/* The date control scrolls sideways on narrow screens instead of wrapping into a tall block. */
+.filters__row > .segmented {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  .cats {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scrollbar-width: none;
+    flex: 1 1 100%;
+  }
+}
+
+.filters__toggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+}
+
+.filters__reset {
+  min-height: 34px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cobalt-700);
+}
+
+.filters__reset:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.filters__note {
+  font-size: 13px;
+  color: var(--ink-600);
+}

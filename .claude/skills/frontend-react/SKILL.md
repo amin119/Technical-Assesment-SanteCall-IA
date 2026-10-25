@@ -18,15 +18,20 @@ goal, Next.js is the natural migration (listed in the roadmap).
 - Local UI state (form input, hover) uses `useState`. No global store library.
 
 ## Structure
-`api/` (typed fetch client, types) · `hooks/` · `components/` (one folder or file per component) ·
-`styles/` (tokens.css, global.css, component CSS next to the component).
+`api/` (typed fetch client, types) · `hooks/` · `lib/` (pure, tested) · `i18n/` ·
+`components/` grouped by feature (`ui/` primitives, `layout/`, `filters/`, `events/`, `drawer/`, `map/`) ·
+`styles/` (tokens.css, base.css). Component CSS sits next to the component and is imported by it.
+
+`App.tsx` only wires data to components. A component that appears twice becomes a primitive in `ui/`
+(see the design-system skill for the list). Logic that is not rendering goes in a hook (`useLocate`, `useUrlState`).
 
 ## Rules
 - Strict TypeScript. No `any`. API types in one file, mirrored from the backend schemas.
 - Use semantic HTML: real `<button>`, `<nav>`, `<main>`, labelled inputs. Visible focus rings.
 - Every async view has loading, empty, and error states, all designed (see design-system skill).
 - Respect `prefers-reduced-motion`: animations collapse to opacity changes.
-- Plain CSS with custom properties (tokens). No CSS framework, no UI kit.
+- Plain CSS with custom properties (tokens). No CSS framework, no UI kit. (The Stitch design was written in Tailwind; we
+  translated it into tokens and classes so the repo has no build-time CSS dependency.)
 - **No hard-coded user-facing text.** Every string lives in `src/i18n/messages.ts` in **both** French and
   English. Use `t('key')`, and `tp('base', n)` for plurals (keys `base_one` and `base_other`). TypeScript fails the build if
   one language is missing a key, and `i18n.test.ts` checks placeholders and plural forms.
@@ -45,6 +50,8 @@ goal, Next.js is the natural migration (listed in the roadmap).
 - **Single-column grids need `minmax(0, 1fr)`**, or long content stretches the page sideways.
 - **Map tiles:** CARTO's free tiles need an API key now. We use OpenStreetMap tiles muted by a CSS
   filter. Production needs a tile provider.
+- **Headless screenshots with motion:** a card can be captured at opacity 0 mid-animation. Pass
+  `--force-prefers-reduced-motion` to Edge. (The DOM was fine, only the capture was early.)
 - **Headless browsers enforce a minimum viewport (about 500px).** Screenshot mobile at 500, not 390.
 - Leaflet is lazy-loaded (`React.lazy`) so it stays out of the first bundle.
 

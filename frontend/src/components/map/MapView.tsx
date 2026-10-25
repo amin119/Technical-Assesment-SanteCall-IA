@@ -1,14 +1,15 @@
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo } from 'react'
 import { Circle, CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet'
-import type { GeoPoint } from '../api/types'
-import { NEAR_RADIUS_KM } from '../lib/filters'
+import type { GeoPoint } from '../../api/types'
+import { NEAR_RADIUS_KM } from '../../lib/filters'
 
 const PARIS: [number, number] = [48.8566, 2.3522]
-const INK = '#17140f'
-const ACCENT = '#e0452b'
+// Leaflet draws on a canvas, so it cannot read CSS variables: these mirror tokens.css.
+const INK = '#334155'
+const COBALT = '#2563eb'
 
-interface Props {
+export interface MapProps {
   points: GeoPoint[]
   selectedId: string | null
   hoveredId: string | null
@@ -18,7 +19,7 @@ interface Props {
 }
 
 /** Moves the camera when the selection or the "around me" position changes. */
-function Camera({ target, near }: { target: GeoPoint | undefined; near: Props['near'] }) {
+function Camera({ target, near }: { target: GeoPoint | undefined; near: MapProps['near'] }) {
   const map = useMap()
   useEffect(() => {
     if (target) map.flyTo([target.lat, target.lon], Math.max(map.getZoom(), 14), { duration: 0.6 })
@@ -29,7 +30,7 @@ function Camera({ target, near }: { target: GeoPoint | undefined; near: Props['n
   return null
 }
 
-export default function MapView({ points, selectedId, hoveredId, near, onSelect, onHover }: Props) {
+export default function MapView({ points, selectedId, hoveredId, near, onSelect, onHover }: MapProps) {
   const active = useMemo(() => points.find((p) => p.id === selectedId), [points, selectedId])
   const hovered = useMemo(() => points.find((p) => p.id === hoveredId), [points, hoveredId])
 
@@ -45,7 +46,7 @@ export default function MapView({ points, selectedId, hoveredId, near, onSelect,
         <Circle
           center={[near.lat, near.lon]}
           radius={NEAR_RADIUS_KM * 1000}
-          pathOptions={{ color: ACCENT, weight: 1, dashArray: '4 6', fillOpacity: 0.04 }}
+          pathOptions={{ color: COBALT, weight: 1, dashArray: '4 6', fillOpacity: 0.05 }}
           interactive={false}
         />
       )}
@@ -53,8 +54,8 @@ export default function MapView({ points, selectedId, hoveredId, near, onSelect,
         <CircleMarker
           key={p.id}
           center={[p.lat, p.lon]}
-          radius={4}
-          pathOptions={{ color: INK, weight: 0, fillColor: INK, fillOpacity: 0.55 }}
+          radius={4.5}
+          pathOptions={{ color: '#fff', weight: 1, fillColor: INK, fillOpacity: 0.7 }}
           eventHandlers={{ click: () => onSelect(p.id), mouseover: () => onHover(p.id), mouseout: () => onHover(null) }}
         />
       ))}
@@ -65,11 +66,11 @@ export default function MapView({ points, selectedId, hoveredId, near, onSelect,
             <CircleMarker
               key={`${i}-${p.id}`}
               center={[p.lat, p.lon]}
-              radius={i === 1 ? 9 : 7}
-              pathOptions={{ color: '#f4f0e8', weight: 2, fillColor: ACCENT, fillOpacity: 1 }}
+              radius={i === 1 ? 10 : 8}
+              pathOptions={{ color: '#fff', weight: 3, fillColor: COBALT, fillOpacity: 1 }}
               eventHandlers={{ click: () => onSelect(p.id) }}
             >
-              <Tooltip direction="top" offset={[0, -8]} opacity={1} permanent={i === 1}>
+              <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={i === 1}>
                 {p.title}
               </Tooltip>
             </CircleMarker>
