@@ -27,7 +27,14 @@ goal, Next.js is the natural migration (listed in the roadmap).
 - Every async view has loading, empty, and error states, all designed (see design-system skill).
 - Respect `prefers-reduced-motion`: animations collapse to opacity changes.
 - Plain CSS with custom properties (tokens). No CSS framework, no UI kit.
-- UI text is French. Code, comments and docs are English.
+- **No hard-coded user-facing text.** Every string lives in `src/i18n/messages.ts` in **both** French and
+  English. Use `t('key')`, and `tp('base', n)` for plurals (keys `base_one` and `base_other`). TypeScript fails the build if
+  one language is missing a key, and `i18n.test.ts` checks placeholders and plural forms.
+- Format dates, numbers and ordinals through `lib/format.ts` (it uses `Intl` with the current language).
+  Never write `'fr-FR'` or `toLocaleString()` in a component.
+- Event titles and descriptions come from Paris Open Data in French: render them with `lang="fr"`, do not translate them.
+- Show server errors by their `code` mapped to a translated message, never the API's English `message`.
+- Code, comments and docs are English.
 
 ## Gotchas
 - **Keep render pure.** No `new Date()` or `Date.now()` during render (oxlint flags it). The URL-state

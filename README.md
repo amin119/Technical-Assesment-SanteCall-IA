@@ -2,11 +2,15 @@
 
 Find what to do in Paris: concerts, theatre, exhibitions, sport. Filter by date, category, price or distance, see it on a map, and **reserve a seat**.
 
+Available in **French and English** (switch at the top right).
+
 Real data from [Paris Open Data](https://opendata.paris.fr/explore/dataset/que-faire-a-paris-/) (about 3,000 upcoming events).
 
-![Home](docs/screenshots/home.png)
+| Français | English |
+|---|---|
+| ![Home in French](docs/screenshots/home.png) | ![Home in English](docs/screenshots/home-en.png) |
 
-|  |  |
+| Event detail and reservation | Mobile |
 |---|---|
 | ![Event detail with reservation](docs/screenshots/detail.png) | ![Mobile](docs/screenshots/mobile.png) |
 
@@ -31,6 +35,8 @@ cd backend
 uv run python -m app.demo.race
 ```
 
+The demo event is deleted afterwards, so it never appears in the real list.
+
 ```
 answered in 0.98s: {'booked': 10, 'sold_out': 90}
 database: seats_taken=10, booking rows=10 (capacity 10)
@@ -49,6 +55,7 @@ How it works, in one line: **one atomic `UPDATE ... WHERE seats_taken < capacity
 | Python tooling | **uv** | One fast tool for Python, venv and a lockfile. Reproducible installs. |
 | Frontend | **React + Vite + TypeScript** | A SPA is enough here (no login, no SEO need). |
 | Data fetching | TanStack Query | Caching and cancellation without hand-written effects. |
+| Languages | Small typed FR/EN layer (no library) | Missing translations fail at compile time. See [decisions](docs/DECISIONS.md#11-translations-french-and-english-with-a-small-typed-layer). |
 | Map | Leaflet + OpenStreetMap | Free, no API key. |
 | Delivery | Docker Compose, GitHub Actions | One command to run. CI tests against a real CockroachDB. |
 
@@ -84,14 +91,14 @@ backend/app/
   db.py        connection pool + transaction retry
   schema.sql   tables and the constraints that protect reservations
 backend/tests/ 27 tests: normalisation, search, booking, concurrency
-frontend/src/  api/, hooks/, components/, lib/ (pure, tested), styles/
+frontend/src/  api/, hooks/, components/, i18n/ (FR and EN text), lib/ (pure, tested), styles/
 docs/          ARCHITECTURE.md (system design), DECISIONS.md
 .claude/skills project rules for AI-assisted work (see below)
 ```
 
 ## What is real, and what is not
 
-- **Real:** events, dates, venues, prices, coordinates and images come from Paris Open Data.
+- **Real:** events, dates, venues, prices, coordinates and images come from Paris Open Data. Event titles and descriptions are published in French, so they stay in French even in the English interface.
 - **Not real:** seat capacity. The open data has none, so each event gets a stable fake capacity (20 to 200). Reservations demonstrate correct concurrency, they are not real ticketing. There is no login: a reservation is identified by email only.
 
 ## Next steps

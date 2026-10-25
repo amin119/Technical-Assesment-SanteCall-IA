@@ -31,7 +31,8 @@ Never hard-code a colour or font in a component. Add a token first, and justify 
 - Border radius is 2px. Pills are not used.
 - Colours: paper, ink, one accent. Categories are plain text, not a rainbow of badges.
 - Generous whitespace, 4px rhythm, a real type scale (12 / 13 / 15 / 28 / display).
-- Copy is specific and calm ("Plus que 3 places", "Rien ne correspond à ces filtres"), never filler.
+- Copy is specific and calm ("Only 3 seats left" / "Plus que 3 places"), never filler. Write both languages with the same tone.
+- Layouts must survive both languages: English is shorter, French is about 15 to 20% longer. Never size a box to one language's text.
 - One signature detail per screen, not ten. Here: the headline rewrites itself with the date filter.
 
 ## Motion

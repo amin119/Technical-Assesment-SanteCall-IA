@@ -86,3 +86,20 @@ It is not part of the API process. API restarts never trigger a heavy import, a 
 | Email confirmation | Needs an email provider. The retry-safe transaction is already designed so sending would happen **after** commit. |
 | Scheduled re-ingestion | One command today. A cron or CI schedule is a one-line addition. |
 | End-to-end browser tests | Backend and logic are covered. A Playwright test of the booking flow is the next test to add. |
+
+## 11. Translations: French and English with a small typed layer
+
+**Chosen.** About 120 lines of our own code in `frontend/src/i18n/`: one file of messages per language, a `t()` function, a `tp()` function for plurals, and a FR | EN switch.
+
+**Why not a library (react-i18next, FormatJS).** We have about 100 short strings and two languages. A library adds a dependency, a runtime loader and a config for little gain. Our version also gives something libraries do not by default: **`en` is typed as `Record<MessageKey, string>`, so the project does not compile if a key is missing in one language.** A test also checks that `{placeholders}` match and every plural has both forms.
+
+**How it works.**
+- Plurals use the browser's `Intl.PluralRules`, so each language follows its own rule (French says "0 événement", English says "0 events").
+- Dates, numbers and ordinals use `Intl` too (`sam. 7 nov.` and `Sat 7 Nov`, `2 960` and `2,960`, `9e` and `9th`). Dates always show Paris time.
+- The start language is `?lang=` in the URL, then the saved choice, then the browser language. `<html lang>` and the page title follow it.
+- Category names are translated in the browser from the category *slug*. The API keeps its French `label` as a fallback for other clients and for any new category the browser does not know yet.
+- Booking errors: the API returns a stable `code` (`sold_out`...). The wording is ours, in the visitor's language. The English `message` from the API is never shown to users.
+
+**What is not translated, on purpose.** Event titles and descriptions come from Paris Open Data in French. Machine-translating third-party text would risk wrong information (dates, prices), so we show it as published and mark it `lang="fr"` so screen readers pronounce it correctly. The English footer says so.
+
+**Cost.** Adding a third language means one more message file and one more entry in `LANGS`. Right-to-left languages would also need layout work.
