@@ -175,7 +175,7 @@ Liste honnête. Rien de cela n'est construit, et je n'ai pas mesuré au-delà de
 | Plus de lecteurs | Le processeur de l'API, puis les lectures de la base | Lancer plus de copies d'`api` (sans état). Mettre en cache `/api/categories` et les recherches courantes quelques secondes. Ajouter un CDN pour le site statique. |
 | Un événement très populaire (une « ligne chaude ») | Toutes les réservations passent l'une après l'autre sur une seule ligne, donc les nouvelles tentatives augmentent | Répartir le compteur sur N lignes et les additionner. Ou faire passer les réservations de cet événement par une file. |
 | Qualité de la recherche texte | `ILIKE` ne gère pas les accents et ne classe pas les résultats | D'abord un index trigramme. Recherche plein texte ou OpenSearch si cela compte. |
-| Pagination profonde | `OFFSET` ralentit sur les dernières pages | Pagination par curseur sur `(starts_at, id)`. |
+| Pagination profonde | `OFFSET` ralentit sur les dernières pages (ici 145 pages au plus, c'est sans importance) | Pagination par curseur sur `(starts_at, id)`. |
 | Fraîcheur des données | Import manuel | Lancer `ingest` à intervalle régulier (cron ou tâche CI). Supprimer les événements disparus de la source. |
 | Un seul nœud de base | Disponibilité | Un cluster CockroachDB de 3 nœuds. Même SQL, aucun changement de code. |
 | Abus | Spam de réservations, aspiration des données | Limitation de débit dans nginx ou une passerelle d'API, vérification de l'e-mail, CAPTCHA. |
@@ -207,6 +207,10 @@ flowchart LR
 
 `docker compose up --build` est toute l'histoire du déploiement pour la démo : quatre conteneurs, démarrés dans l'ordre des dépendances grâce aux contrôles de santé (base saine, puis API saine, puis ingest et web). L'image du frontend est en plusieurs étapes : l'image finale ne contient que nginx et les fichiers statiques.
 
+### Sur Vercel
+
+En production, le site statique et l'API sont servis par Vercel, et la base est CockroachDB Cloud. L'API tourne en fonction serverless avec des connexions courtes (mode `direct`) à la place du pool. Le détail est dans [DEPLOIEMENT.md](DEPLOIEMENT.md).
+
 ## 11. Le frontend
 
 Application monopage organisée en composants réutilisables :
@@ -226,4 +230,5 @@ components/
 - **`App.tsx` ne fait que relier les données aux composants.** La logique hors affichage est dans des hooks (`useUrlState`, `useLocate`, `queries`).
 - **Deux langues** (FR et EN) via une petite couche typée : une clé manquante empêche la compilation.
 - **Le design** vient de Google Stitch, reconstruit sur des variables CSS (`styles/tokens.css`) : aucune couleur ni police n'est écrite en dur dans un composant.
+- **Pagination** : pages numérotées (`?page=3`), 20 événements par page. Le numéro de page est dans l'URL comme les filtres. Changer un filtre revient à la page 1. L'API reçoit `limit` et `offset`.
 - **Mobile** : la liste et la carte se partagent l'écran. Un bouton flottant « Carte / Liste » (visible sous 900 px) permet de passer de l'une à l'autre.

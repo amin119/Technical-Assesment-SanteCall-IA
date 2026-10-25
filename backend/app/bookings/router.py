@@ -4,10 +4,10 @@ from uuid import UUID
 
 import psycopg
 from fastapi import APIRouter, Depends
-from psycopg_pool import AsyncConnectionPool
 from pydantic import BaseModel, EmailStr
 
 from app.bookings import service
+from app.db import ConnectionSource
 from app.errors import ApiError
 from app.events.router import get_pool
 
@@ -30,7 +30,7 @@ class BookingOut(BaseModel):
 async def create_booking(
     event_id: str,
     body: BookingIn,
-    pool: Annotated[AsyncConnectionPool, Depends(get_pool)],
+    pool: Annotated[ConnectionSource, Depends(get_pool)],
 ) -> BookingOut:
     try:
         booking = await service.reserve_seat(pool, event_id, body.email)

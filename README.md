@@ -24,6 +24,10 @@ docker compose up --build
 
 Ouvrez **http://localhost:8080**. Au premier démarrage, les événements sont importés (environ 30 secondes). L'interface d'administration de la base est sur http://localhost:8081.
 
+## Mettre en ligne (Vercel)
+
+Le site et l'API se déploient sur Vercel, avec une base CockroachDB Cloud (essai gratuit). Guide pas à pas : [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md).
+
 ## Le point technique central : deux personnes, une dernière place
 
 Quand deux personnes réservent la dernière place au même instant, **une seule** l'obtient. Jamais les deux.
@@ -58,7 +62,8 @@ Le principe en une phrase : **une seule requête `UPDATE ... WHERE seats_taken <
 | Langues | Petite couche FR/EN typée (sans bibliothèque) | Une traduction manquante empêche la compilation. Voir les [décisions](docs/DECISIONS.md#11-traductions--français-et-anglais-avec-une-petite-couche-typée). |
 | Design | CSS simple avec variables, Plus Jakarta Sans et Newsreader | Maquette créée avec Google Stitch, reconstruite en composants réutilisables. Voir les [décisions](docs/DECISIONS.md#12-design-visuel-issu-de-google-stitch-reconstruit-en-composants). |
 | Carte | Leaflet + OpenStreetMap | Gratuit, sans clé d'API. |
-| Livraison | Docker Compose, GitHub Actions | Une commande pour lancer. La CI teste contre une vraie CockroachDB. |
+| Pagination | Pages numérotées, page dans l'URL | Liens partageables, bouton retour fonctionnel. Voir les [décisions](docs/DECISIONS.md#14-pagination--pages-numérotées-pas-de-défilement-infini). |
+| Livraison | Docker Compose, Vercel, GitHub Actions | Une commande pour lancer. La CI teste contre une vraie CockroachDB. |
 
 Chaque choix, et ce qu'il coûte, est expliqué dans [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -91,6 +96,8 @@ backend/app/
   ingest/      client Paris Data, normalisation (fonctions pures), insertion
   db.py        pool de connexions + nouvelle tentative des transactions
   schema.sql   tables et contraintes qui protègent les réservations
+api/            point d'entrée Vercel (la même API FastAPI, en fonction serverless)
+vercel.json     configuration du déploiement Vercel
 backend/tests/ 27 tests : normalisation, recherche, réservation, concurrence
 frontend/src/
   components/  ui/ (briques réutilisables), layout/, filters/, events/, drawer/, map/

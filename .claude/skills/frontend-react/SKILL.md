@@ -15,6 +15,8 @@ goal, Next.js is the natural migration (listed in the roadmap).
 - **Server data**: TanStack Query only. No `useEffect` + `fetch` + `useState` triples.
 - **Filters and selected event live in the URL** (`?category=concert&when=weekend&event=abc`).
   Links are shareable, the back button works, refresh keeps the view. Hook: `useFilters`.
+- **The page number is part of the filters** (`?page=3`, 20 per page). Any filter change resets it to 1 (`setFilters` in
+  `App.tsx`). Page maths lives in `lib/pagination.ts` (pure, tested). Use the `Pagination` primitive, not a "load more" button.
 - Local UI state (form input, hover) uses `useState`. No global store library.
 
 ## Structure

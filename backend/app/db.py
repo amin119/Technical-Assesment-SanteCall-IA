@@ -8,7 +8,8 @@ rows at the same time, it aborts one with SQLSTATE 40001 and expects the client 
 import asyncio
 import logging
 import random
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import psycopg
@@ -21,9 +22,48 @@ log = logging.getLogger("sortir.db")
 
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 
+# CockroachDB Cloud: the cluster's CA certificate (downloaded from the Cloud Console, see
+# docs/DEPLOIEMENT.md). If the file is there we verify the server against it. It lives inside `app/`
+# so it is shipped with the code on Vercel, where there is no ~/.postgresql/root.crt.
+CA_CERT_PATH = Path(__file__).parent / "certs" / "cockroach-ca.crt"
+
+
+def _connect_kwargs() -> dict:
+    """Options for every connection. Autocommit lets us control BEGIN/COMMIT explicitly."""
+    kwargs: dict = {"autocommit": True, "row_factory": dict_row}
+    if CA_CERT_PATH.exists():
+        kwargs["sslrootcert"] = str(CA_CERT_PATH)
+    return kwargs
+
+
 # Counts how many times a transaction had to be re-run. Exposed on /api/health so the
 # effect of contention is visible during the demo.
 tx_retries = 0
+
+
+class DirectConnections:
+    """Opens a fresh connection each time `connection()` is used, and closes it afterwards.
+
+    Same `async with source.connection() as conn` shape as the pool, so the rest of the code does not
+    care which one it has. Serverless functions freeze between requests and may resume on a different
+    event loop, which breaks a long-lived pool. A short-lived connection per request is always safe.
+    The price is one connection handshake per request (tens of milliseconds).
+    """
+
+    def __init__(self, url: str) -> None:
+        self.url = url
+
+    @asynccontextmanager
+    async def connection(self) -> AsyncIterator[psycopg.AsyncConnection]:
+        conn = await psycopg.AsyncConnection.connect(self.url, **_connect_kwargs())
+        try:
+            yield conn
+        finally:
+            await conn.close()
+
+
+# Anything that can hand out connections: the pool (default) or DirectConnections (serverless).
+type ConnectionSource = AsyncConnectionPool | DirectConnections
 
 
 def make_pool(url: str | None = None) -> AsyncConnectionPool:
@@ -32,18 +72,18 @@ def make_pool(url: str | None = None) -> AsyncConnectionPool:
         url or settings.database_url,
         min_size=settings.pool_min_size,
         max_size=settings.pool_max_size,
-        kwargs={"autocommit": True, "row_factory": dict_row},
+        kwargs=_connect_kwargs(),
         open=False,
     )
 
 
-async def init_schema(pool: AsyncConnectionPool) -> None:
+async def init_schema(pool: ConnectionSource) -> None:
     async with pool.connection() as conn:
         await conn.execute(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
 async def run_transaction[T](
-    pool: AsyncConnectionPool,
+    pool: ConnectionSource,
     work: Callable[[psycopg.AsyncConnection], Awaitable[T]],
     *,
     max_attempts: int = 10,

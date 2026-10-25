@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createTranslator } from '../i18n/translator'
 import { dateBlock, seatsLabel } from './format'
+import { pageCount, pageRange, pageWindow } from './pagination'
 import { DEFAULT_FILTERS, isDefault, parseSearch, toApiParams, toSearch, whenToRange } from './filters'
 
 // 2026-10-24 is a Saturday; 2026-10-21 a Wednesday; 2026-10-25 a Sunday.
@@ -42,7 +43,7 @@ describe('whenToRange', () => {
 
 describe('URL state', () => {
   it('round-trips filters and the selected event', () => {
-    const filters = { q: 'jazz', when: 'weekend' as const, categories: ['concert', 'theatre'], free: true, near: { lat: 48.8566, lon: 2.3522 } }
+    const filters = { q: 'jazz', when: 'weekend' as const, categories: ['concert', 'theatre'], free: true, near: { lat: 48.8566, lon: 2.3522 }, page: 4 }
     const parsed = parseSearch(toSearch(filters, 'abc'))
     expect(parsed.filters).toEqual(filters)
     expect(parsed.eventId).toBe('abc')
@@ -57,6 +58,16 @@ describe('URL state', () => {
     const { filters } = parseSearch('?when=nonsense&near=abc')
     expect(filters.when).toBe('all')
     expect(filters.near).toBeNull()
+  })
+
+  it('keeps page 1 out of the URL and repairs bad page numbers', () => {
+    expect(toSearch({ ...DEFAULT_FILTERS, page: 1 }, null)).toBe('')
+    expect(toSearch({ ...DEFAULT_FILTERS, page: 3 }, null)).toBe('?page=3')
+    for (const bad of ['0', '-2', 'abc', '2.5', '']) expect(parseSearch(`?page=${bad}`).filters.page).toBe(1)
+  })
+
+  it('does not send the page to the API as a filter', () => {
+    expect(toApiParams({ ...DEFAULT_FILTERS, page: 9 }).has('page')).toBe(false)
   })
 })
 
@@ -95,5 +106,44 @@ describe('format', () => {
     expect(seatsLabel(0, 100, fr)).toBe('Complet')
     expect(seatsLabel(2, 100, fr)).toBe('Plus que 2 places')
     expect(seatsLabel(60, 100, fr)).toBe('60 places')
+  })
+})
+
+describe('pagination', () => {
+  it('counts pages, with at least one', () => {
+    expect(pageCount(0, 20)).toBe(1)
+    expect(pageCount(20, 20)).toBe(1)
+    expect(pageCount(21, 20)).toBe(2)
+    expect(pageCount(2887, 20)).toBe(145)
+  })
+
+  it('shows every page when there are few', () => {
+    expect(pageWindow(1, 1)).toEqual([1])
+    expect(pageWindow(2, 5)).toEqual([1, 2, 3, 4, 5])
+  })
+
+  it('puts gaps only where they hide two or more pages', () => {
+    expect(pageWindow(1, 145)).toEqual([1, 2, 'gap', 145])
+    expect(pageWindow(6, 145)).toEqual([1, 'gap', 5, 6, 7, 'gap', 145])
+    expect(pageWindow(4, 145)).toEqual([1, 2, 3, 4, 5, 'gap', 145])
+    expect(pageWindow(145, 145)).toEqual([1, 'gap', 144, 145])
+  })
+
+  it('never lists a page twice or out of order', () => {
+    for (const count of [1, 2, 3, 7, 50]) {
+      for (let page = 1; page <= count; page++) {
+        const numbers = pageWindow(page, count).filter((i): i is number => i !== 'gap')
+        expect(numbers).toEqual([...new Set(numbers)].sort((a, b) => a - b))
+        expect(numbers).toContain(page)
+        expect(numbers[0]).toBe(1)
+        expect(numbers.at(-1)).toBe(count)
+      }
+    }
+  })
+
+  it('gives the range of results on a page', () => {
+    expect(pageRange(1, 20, 2887)).toEqual({ from: 1, to: 20 })
+    expect(pageRange(145, 20, 2887)).toEqual({ from: 2881, to: 2887 })
+    expect(pageRange(1, 20, 0)).toEqual({ from: 0, to: 0 })
   })
 })

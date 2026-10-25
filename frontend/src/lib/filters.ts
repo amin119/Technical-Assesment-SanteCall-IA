@@ -11,13 +11,21 @@ export interface Filters {
   categories: string[]
   free: boolean
   near: { lat: number; lon: number } | null
+  /** 1-based page of results. Not sent to the API as a filter: it becomes `offset`. */
+  page: number
 }
 
-export const DEFAULT_FILTERS: Filters = { q: '', when: 'all', categories: [], free: false, near: null }
+export const DEFAULT_FILTERS: Filters = { q: '', when: 'all', categories: [], free: false, near: null, page: 1 }
 
 export const NEAR_RADIUS_KM = 3
 
 const WHENS = new Set<string>(WHEN_VALUES)
+
+/** `?page=` as a whole number of at least 1. Anything else means page 1. */
+function parsePage(raw: string | null): number {
+  const n = Number(raw)
+  return Number.isInteger(n) && n >= 1 ? n : 1
+}
 
 /** Read the page URL. Unknown or malformed values fall back to defaults instead of throwing. */
 export function parseSearch(search: string): { filters: Filters; eventId: string | null } {
@@ -32,6 +40,7 @@ export function parseSearch(search: string): { filters: Filters; eventId: string
       categories: p.getAll('category'),
       free: p.get('free') === '1',
       near,
+      page: parsePage(p.get('page')),
     },
     eventId: p.get('event'),
   }
@@ -45,6 +54,7 @@ export function toSearch(filters: Filters, eventId: string | null): string {
   filters.categories.forEach((c) => p.append('category', c))
   if (filters.free) p.set('free', '1')
   if (filters.near) p.set('near', `${filters.near.lat.toFixed(4)},${filters.near.lon.toFixed(4)}`)
+  if (filters.page > 1) p.set('page', String(filters.page))
   if (eventId) p.set('event', eventId)
   const s = p.toString()
   return s ? `?${s}` : ''

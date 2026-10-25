@@ -41,6 +41,13 @@ npm run dev                          # :5173, proxies /api to :8000
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
+## Deploy (Vercel)
+
+One Vercel project at the repo root: `vercel.json` builds `frontend/` to static files and serves FastAPI from
+`api/index.py` under `/api/*` (short-lived DB connections, `SORTIR_POOL_MODE=direct`). Database: CockroachDB Cloud.
+Guide (French): `docs/DEPLOIEMENT.md`. `requirements.txt` at the root is generated: refresh it with
+`uv export --project backend --frozen --no-dev --no-hashes --no-emit-project -o requirements.txt` after `uv add`.
+
 ## Layout
 
 ```

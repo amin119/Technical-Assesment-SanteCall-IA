@@ -6,9 +6,8 @@ Goal: if 50 people ask for the last 10 seats at the same moment, exactly 10 succ
 from typing import Any
 
 import psycopg
-from psycopg_pool import AsyncConnectionPool
 
-from app.db import run_transaction
+from app.db import ConnectionSource, run_transaction
 
 
 class EventNotFound(Exception):
@@ -23,7 +22,7 @@ class AlreadyBooked(Exception):
     pass
 
 
-async def reserve_seat(pool: AsyncConnectionPool, event_id: str, email: str) -> dict[str, Any]:
+async def reserve_seat(pool: ConnectionSource, event_id: str, email: str) -> dict[str, Any]:
     email = email.strip().lower()
 
     async def work(conn: psycopg.AsyncConnection) -> dict[str, Any]:

@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request
-from psycopg_pool import AsyncConnectionPool
 
+from app.db import ConnectionSource
 from app.errors import ApiError
 from app.events import repository
 from app.events.repository import EventFilters
@@ -19,11 +19,11 @@ from app.ingest.normalize import CATEGORY_LABELS
 router = APIRouter(prefix="/api", tags=["events"])
 
 
-def get_pool(request: Request) -> AsyncConnectionPool:
+def get_pool(request: Request) -> ConnectionSource:
     return request.app.state.pool
 
 
-Pool = Annotated[AsyncConnectionPool, Depends(get_pool)]
+Pool = Annotated[ConnectionSource, Depends(get_pool)]
 
 
 def get_filters(

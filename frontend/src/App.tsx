@@ -1,5 +1,5 @@
 import { AnimatePresence, MotionConfig } from 'motion/react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EventDrawer } from './components/drawer/EventDrawer'
 import { EventList, ListSkeleton } from './components/events/EventList'
 import { FilterBar } from './components/filters/FilterBar'
@@ -9,13 +9,15 @@ import { Masthead } from './components/layout/Masthead'
 import { MapPanel } from './components/map/MapPanel'
 import { Button } from './components/ui/Button'
 import { Icon } from './components/ui/Icon'
+import { Pagination } from './components/ui/Pagination'
 import { StateMessage } from './components/ui/StateMessage'
-import { useCategories, useEvents, useGeo } from './hooks/queries'
+import { PAGE_SIZE, useCategories, useEvents, useGeo } from './hooks/queries'
 import { useLocate } from './hooks/useLocate'
 import { useUrlState } from './hooks/useUrlState'
 import { useI18n } from './i18n/useI18n'
 import { DEFAULT_FILTERS, isDefault, toApiParams, type Filters } from './lib/filters'
 import { formatCount } from './lib/format'
+import { pageCount } from './lib/pagination'
 import './App.css'
 
 export default function App() {
@@ -27,21 +29,36 @@ export default function App() {
   const params = useMemo(() => toApiParams(filters, new Date(stamp)), [filters, stamp])
   const countParams = useMemo(() => toApiParams(filters, new Date(stamp), false), [filters, stamp])
 
-  const events = useEvents(params, filters.near !== null)
+  const events = useEvents(params, filters.page, filters.near !== null)
   const categories = useCategories(countParams)
   const geo = useGeo(params)
 
-  const items = useMemo(() => events.data?.pages.flatMap((p) => p.items) ?? [], [events.data])
-  const total = events.data?.pages[0]?.total
+  const items = events.data?.items ?? []
+  const total = events.data?.total
+  const resultsRef = useRef<HTMLElement>(null)
 
   const setFilters = useCallback(
-    (patch: Partial<Filters>, replace = false) => update({ filters: { ...filters, ...patch } }, replace),
+    // Any filter change goes back to page 1: page 7 of the old results means nothing for the new ones.
+    (patch: Partial<Filters>, replace = false) => update({ filters: { ...filters, page: 1, ...patch } }, replace),
     [filters, update],
   )
+  const goToPage = (page: number) => {
+    update({ filters: { ...filters, page } })
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    resultsRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' })
+  }
   const reset = () => update({ filters: DEFAULT_FILTERS })
   const select = useCallback((id: string) => update({ eventId: id }), [update])
   const close = useCallback(() => update({ eventId: null }, true), [update])
   const { locating, error: geoError, locate } = useLocate(filters.near, (near) => setFilters({ near }))
+
+  // A link to a page that no longer exists (the list got shorter): go to the last real page.
+  const lastPage = total === undefined ? undefined : pageCount(total, PAGE_SIZE)
+  useEffect(() => {
+    if (lastPage !== undefined && !events.isPlaceholderData && filters.page > lastPage) {
+      update({ filters: { ...filters, page: lastPage } }, true)
+    }
+  }, [lastPage, events.isPlaceholderData, filters, update])
 
   return (
     <MotionConfig reducedMotion="user">
@@ -61,7 +78,7 @@ export default function App() {
         />
 
         <div className={`split shell split--${view}`}>
-          <section className="results" aria-label={t('list.label')}>
+          <section className="results" ref={resultsRef} aria-label={t('list.label')}>
             <p className="results__count" aria-live="polite">
               {total !== undefined && tp('hero.count', total, { n: formatCount(total, lang) })}
               {total !== undefined && filters.near && ` · ${t('list.byDistance')}`}
@@ -78,18 +95,19 @@ export default function App() {
             )}
 
             {items.length > 0 && (
-              <EventList
-                events={items}
-                now={stamp}
-                selectedId={eventId}
-                hoveredId={hoveredId}
-                hasMore={events.hasNextPage}
-                loadingMore={events.isFetchingNextPage}
-                onSelect={select}
-                onHover={setHoveredId}
-                onMore={() => void events.fetchNextPage()}
-              />
+              <div className={events.isPlaceholderData ? 'results__page is-loading' : 'results__page'} aria-busy={events.isPlaceholderData}>
+                <EventList
+                  events={items}
+                  now={stamp}
+                  selectedId={eventId}
+                  hoveredId={hoveredId}
+                  onSelect={select}
+                  onHover={setHoveredId}
+                />
+              </div>
             )}
+
+            {total !== undefined && <Pagination page={filters.page} pageSize={PAGE_SIZE} total={total} onChange={goToPage} />}
           </section>
 
           <div className="split__map">

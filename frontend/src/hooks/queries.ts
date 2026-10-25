@@ -1,21 +1,22 @@
-import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 
-export const PAGE_SIZE = 30
+export const PAGE_SIZE = 20
 
-/** Paged event list. Keeps the previous results on screen while a new filter loads (no flash). */
-export function useEvents(params: URLSearchParams, sortByDistance: boolean) {
-  return useInfiniteQuery({
-    queryKey: ['events', params.toString(), sortByDistance],
-    queryFn: ({ pageParam, signal }) => {
+/**
+ * One page of events. Keeps the previous page on screen while the next one loads (no flash),
+ * and `isPlaceholderData` tells the UI it is still showing the old page.
+ */
+export function useEvents(params: URLSearchParams, page: number, sortByDistance: boolean) {
+  return useQuery({
+    queryKey: ['events', params.toString(), page, sortByDistance],
+    queryFn: ({ signal }) => {
       const p = new URLSearchParams(params)
       p.set('limit', String(PAGE_SIZE))
-      p.set('offset', String(pageParam))
+      p.set('offset', String((page - 1) * PAGE_SIZE))
       if (sortByDistance) p.set('sort', 'distance')
       return api.events(p, signal)
     },
-    initialPageParam: 0,
-    getNextPageParam: (last) => (last.offset + last.items.length < last.total ? last.offset + last.limit : undefined),
     placeholderData: keepPreviousData,
   })
 }

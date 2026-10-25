@@ -1,6 +1,5 @@
 import type { EventSummary } from '../../api/types'
 import { useI18n } from '../../i18n/useI18n'
-import { Button } from '../ui/Button'
 import { EventCard } from './EventCard'
 import './events.css'
 
@@ -9,39 +8,26 @@ interface Props {
   now: number
   selectedId: string | null
   hoveredId: string | null
-  hasMore: boolean
-  loadingMore: boolean
   onSelect: (id: string) => void
   onHover: (id: string | null) => void
-  onMore: () => void
 }
 
-export function EventList({ events, now, selectedId, hoveredId, hasMore, loadingMore, onSelect, onHover, onMore }: Props) {
-  const { t } = useI18n()
+export function EventList({ events, now, selectedId, hoveredId, onSelect, onHover }: Props) {
   return (
-    <>
-      <ul className="cards">
-        {events.map((e, i) => (
-          <EventCard
-            key={e.id}
-            event={e}
-            index={i}
-            now={now}
-            selected={e.id === selectedId}
-            hovered={e.id === hoveredId}
-            onSelect={onSelect}
-            onHover={onHover}
-          />
-        ))}
-      </ul>
-      {hasMore && (
-        <div className="cards__more">
-          <Button variant="secondary" onClick={onMore} disabled={loadingMore}>
-            {loadingMore ? t('list.loadingMore') : t('list.more')}
-          </Button>
-        </div>
-      )}
-    </>
+    <ul className="cards">
+      {events.map((e, i) => (
+        <EventCard
+          key={e.id}
+          event={e}
+          index={i}
+          now={now}
+          selected={e.id === selectedId}
+          hovered={e.id === hoveredId}
+          onSelect={onSelect}
+          onHover={onHover}
+        />
+      ))}
+    </ul>
   )
 }
 

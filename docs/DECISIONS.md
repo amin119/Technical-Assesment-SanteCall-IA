@@ -117,3 +117,43 @@ Il ne fait pas partie du processus de l'API. Un redémarrage de l'API ne déclen
 **Le bouton « Carte / Liste ».** Sur petit écran (moins de 900 px), la liste et la carte ne tiennent pas côte à côte. Un bouton flottant bascule de l'une à l'autre. Il est masqué sur grand écran.
 
 **Coût.** Tailwind n'a pas été adopté : le design a dû être traduit à la main en variables et classes. En échange, le dépôt n'a aucune dépendance de construction pour le CSS et les styles de chaque composant sont à côté de lui.
+
+## 13. Déploiement : Vercel, un seul projet, connexions courtes
+
+**Choix.** Un seul projet Vercel à la racine du dépôt : le frontend est construit en fichiers statiques, et l'API FastAPI est exposée par une fonction serverless (`api/index.py`) derrière `/api/*`. La base est CockroachDB Cloud (essai gratuit : voir les limites dans [DEPLOIEMENT.md](DEPLOIEMENT.md#limites-honnêtes)).
+
+**Pourquoi un seul projet.** Le site et l'API ont la même adresse, comme avec nginx en local : pas de CORS, pas d'adresse d'API à écrire en dur, une seule chose à déployer.
+
+**Pourquoi des connexions courtes (mode `direct`).** Une fonction serverless est gelée entre deux requêtes et peut reprendre sur une autre boucle d'événements. Un pool de connexions de longue durée y devient fragile. Chaque requête ouvre donc sa propre connexion, puis la ferme. Le code de réservation n'a pas changé : ce sont toujours les mêmes transactions sérialisables avec nouvelle tentative. `tests/test_direct_mode.py` rejoue la course de concurrence avec ce mode. Le pool reste le mode par défaut pour Docker et le développement.
+
+**Pourquoi CockroachDB Cloud.** Vercel n'a pas de base de données, et passer à une base PostgreSQL ordinaire changerait la garantie de concurrence que tout le projet démontre.
+
+**Alternatives écartées.**
+
+| Option | Pourquoi pas |
+|---|---|
+| Deux projets Vercel (site et API) | Il faudrait écrire l'adresse de l'API en dur dans le site ou gérer le CORS. |
+| API sur un hébergeur de conteneurs (Fly.io, Render) | Marche très bien avec notre Dockerfile, mais la demande était Vercel. À garder comme plan B. |
+| Pool de connexions en mémoire dans la fonction | Fragile quand l'instance est gelée puis relancée. |
+
+**Coût.** Une connexion à établir à chaque requête. L'import des événements reste manuel (voir [DEPLOIEMENT.md](DEPLOIEMENT.md)).
+
+## 14. Pagination : pages numérotées (pas de défilement infini)
+
+**Choix.** Des pages de 20 événements, avec Précédent / Suivant, une fenêtre de numéros (`1 … 4 5 6 7 8 … 145`) et un résumé « Événements 21 à 40 sur 2 887 ». Le numéro de page est dans l'URL (`?page=6`).
+
+**Pourquoi.**
+- Avec près de 3 000 événements, un « Voir plus » donne une page interminable : le pied de page est inatteignable et on perd sa place au rechargement.
+- Une page précise est **partageable** et le bouton retour fonctionne, comme pour les filtres.
+- Le résumé donne tout de suite l'échelle (« 21 à 40 sur 2 887 »).
+
+**Détails soignés.**
+- Changer un filtre revient à la page 1 (la page 7 de l'ancienne liste ne veut rien dire pour la nouvelle).
+- Changer de page remonte en haut de la liste (en douceur, sauf si l'utilisateur réduit les animations).
+- Pendant le chargement, l'ancienne page reste affichée, légèrement atténuée : pas de page blanche.
+- Un lien vers une page qui n'existe plus mène à la dernière page réelle.
+- Sur mobile, les numéros laissent la place à « Page 6 sur 145 » avec Précédent et Suivant.
+- Un « … » ne remplace jamais un seul numéro : on affiche alors ce numéro.
+
+**Coût.** `OFFSET` ralentit sur les pages très profondes. Avec 145 pages au plus, c'est sans importance ici. Au-delà, la pagination par curseur sur `(starts_at, id)` est l'étape suivante.
+

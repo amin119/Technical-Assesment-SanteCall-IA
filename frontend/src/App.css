@@ -6,6 +6,20 @@
   align-items: start;
 }
 
+.results {
+  /* Keeps the top of the list clear of the sticky header when we scroll to it. */
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+
+.results__page {
+  transition: opacity 0.2s;
+}
+
+.results__page.is-loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 .results__count {
   min-height: 1.5em;
   margin-bottom: 14px;

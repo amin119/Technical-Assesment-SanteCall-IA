@@ -4,10 +4,8 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from psycopg_pool import AsyncConnectionPool
-
 from app.config import settings
-from app.db import init_schema, make_pool, run_transaction
+from app.db import ConnectionSource, init_schema, make_pool, run_transaction
 from app.ingest.client import fetch_pages, make_client
 from app.ingest.normalize import normalize_record
 
@@ -38,7 +36,7 @@ ON CONFLICT (id) DO UPDATE SET
 """
 
 
-async def upsert_events(pool: AsyncConnectionPool, rows: list[dict[str, Any]]) -> None:
+async def upsert_events(pool: ConnectionSource, rows: list[dict[str, Any]]) -> None:
     async def work(conn):
         async with conn.cursor() as cur:
             await cur.executemany(UPSERT_SQL, rows)
@@ -46,7 +44,7 @@ async def upsert_events(pool: AsyncConnectionPool, rows: list[dict[str, Any]]) -
     await run_transaction(pool, work)
 
 
-async def ingest(pool: AsyncConnectionPool) -> int:
+async def ingest(pool: ConnectionSource) -> int:
     """Pull the whole window from the API and upsert it page by page. Returns rows written."""
     total = skipped = 0
     async with make_client() as client:

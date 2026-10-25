@@ -34,7 +34,10 @@ Codes used: `event_not_found`, `sold_out`, `already_booked`, `busy`, `validation
 - Unit tests for pure code, integration tests through `httpx.AsyncClient` + `ASGITransport`.
 - Each test starts from empty tables (fixture truncates).
 
-## Gotchas (each one cost time once)
+## Gotchas
+- **Two connection modes.** `SORTIR_POOL_MODE=pool` (default: Docker, local) or `direct` (Vercel: one short-lived
+  connection per use, `db.DirectConnections`). Type new code against `db.ConnectionSource`, never `AsyncConnectionPool`,
+  and use only `async with source.connection()`. Do not rely on the pool being open in `lifespan` (serverless may skip it). (each one cost time once)
 - **CockroachDB is stricter than Postgres about types.** `6371.0` is a DECIMAL, so `DECIMAL * FLOAT8`
   fails. Cast constants explicitly (`6371::FLOAT8`). Test every new SQL expression against the real DB.
 - **`ON CONFLICT ON CONSTRAINT` is not supported.** Use `ON CONFLICT (col, col)`.

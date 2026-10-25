@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
-from psycopg_pool import AsyncConnectionPool
+from app.db import ConnectionSource
 
 LIST_COLUMNS = """
     id, title, summary, category, starts_at, ends_at, when_text, venue_name, arrondissement,
@@ -78,7 +78,7 @@ def build_where(f: EventFilters, *, include_categories: bool = True) -> tuple[st
 
 
 async def list_events(
-    pool: AsyncConnectionPool, f: EventFilters, *, sort: str, limit: int, offset: int
+    pool: ConnectionSource, f: EventFilters, *, sort: str, limit: int, offset: int
 ) -> tuple[list[dict], int]:
     where, params = build_where(f)
     distance_col = f", {DISTANCE_SQL} AS distance_km" if f.near else ""
@@ -96,7 +96,7 @@ async def list_events(
     return rows, total
 
 
-async def get_event(pool: AsyncConnectionPool, event_id: str) -> dict | None:
+async def get_event(pool: ConnectionSource, event_id: str) -> dict | None:
     async with pool.connection() as conn:
         cur = await conn.execute(
             f"SELECT {LIST_COLUMNS}, description, address, zipcode, price_detail, source_url, tags "
@@ -106,7 +106,7 @@ async def get_event(pool: AsyncConnectionPool, event_id: str) -> dict | None:
         return await cur.fetchone()
 
 
-async def category_counts(pool: AsyncConnectionPool, f: EventFilters) -> list[dict]:
+async def category_counts(pool: ConnectionSource, f: EventFilters) -> list[dict]:
     """Counts per category under the current filters, ignoring the category filter itself,
     so the filter bar can show what each choice would return."""
     where, params = build_where(f, include_categories=False)
@@ -119,7 +119,7 @@ async def category_counts(pool: AsyncConnectionPool, f: EventFilters) -> list[di
         return await cur.fetchall()
 
 
-async def geo_points(pool: AsyncConnectionPool, f: EventFilters, *, limit: int) -> list[dict]:
+async def geo_points(pool: ConnectionSource, f: EventFilters, *, limit: int) -> list[dict]:
     where, params = build_where(f)
     params["limit"] = limit
     async with pool.connection() as conn:
