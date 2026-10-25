@@ -100,4 +100,4 @@ Authentication and email verification, cancelling a reservation, scheduled re-in
 
 ## How I used AI
 
-I built this with Claude Code, and I steered it with written rules rather than ad-hoc prompts. The `.claude/skills/` folder holds the project's standards (concurrency rules, backend and frontend conventions, design system, git and docs style) and `CLAUDE.md` holds the overview. That kept the output consistent and reviewable. I tested everything against the real database and the real API, and checked the UI in a browser. I can explain every decision above.
+I built this with an AI coding assistant, and I steered it with written rules rather than ad-hoc prompts. The `.claude/skills/` folder holds the project's standards (concurrency rules, backend and frontend conventions, design system, git and docs style) and `CLAUDE.md` holds the overview. That kept the output consistent and reviewable. I tested everything against the real database and the real API, and checked the UI in a browser. I can explain every decision above.
