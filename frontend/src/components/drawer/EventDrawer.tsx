@@ -62,7 +62,7 @@ export function EventDrawer({ eventId, onClose }: Props) {
         {event && (
           <div className="drawer__content">
             <div className="drawer__cover">
-              <Thumb src={event.cover_url} />
+              <Thumb src={event.cover_url} eager />
             </div>
 
             <div className="drawer__head">

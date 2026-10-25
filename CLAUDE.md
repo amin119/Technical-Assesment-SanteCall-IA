@@ -76,7 +76,8 @@ docs/               ARCHITECTURE.md, DECISIONS.md
 5. UI follows `.claude/skills/design-system/SKILL.md`. No new colors/fonts outside the tokens. Reuse the `components/ui` primitives.
    All user-facing text goes through `src/i18n/messages.ts` in French **and** English. No hard-coded strings.
 6. Every behaviour change ships with a test. Concurrency tests run against a real CockroachDB, never mocks.
-7. Docs are for a newcomer: short sentences, say *why*, no jargon without a definition.
+7. Docs are for a newcomer: short sentences, say *why*, no jargon without a definition. Project docs are in French;
+   code, comments, commits and skills stay in English.
 8. Small commits, imperative messages (`Add ...`, `Fix ...`). Run lint + tests first.
 9. Verify against the real thing: real CockroachDB for SQL, a real browser for UI. Passing types and
    mocks is not proof. Never claim a number that was not measured.

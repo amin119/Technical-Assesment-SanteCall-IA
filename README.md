@@ -1,41 +1,41 @@
 # Sortir
 
-Find what to do in Paris: concerts, theatre, exhibitions, sport. Filter by date, category, price or distance, see it on a map, and **reserve a seat**.
+Trouvez quoi faire à Paris : concerts, théâtre, expositions, sport. Filtrez par date, catégorie, prix ou distance, voyez les lieux sur une carte et **réservez une place**.
 
-Available in **French and English** (switch at the top right).
+Disponible en **français et en anglais** (sélecteur FR | EN en haut à droite).
 
-Real data from [Paris Open Data](https://opendata.paris.fr/explore/dataset/que-faire-a-paris-/) (about 3,000 upcoming events).
+Les données sont réelles, issues de [Paris Data](https://opendata.paris.fr/explore/dataset/que-faire-a-paris-/) (environ 3 000 événements à venir).
 
 | Français | English |
 |---|---|
-| ![Home in French](docs/screenshots/home.png) | ![Home in English](docs/screenshots/home-en.png) |
+| ![Accueil en français](docs/screenshots/home.png) | ![Accueil en anglais](docs/screenshots/home-en.png) |
 
-| Event detail and reservation | Mobile |
+| Détail et réservation | Mobile |
 |---|---|
-| ![Event detail with reservation](docs/screenshots/detail.png) | ![Mobile](docs/screenshots/mobile.png) |
+| ![Détail d'un événement avec réservation](docs/screenshots/detail.png) | ![Version mobile](docs/screenshots/mobile.png) |
 
-## Run it
+## Lancer le projet
 
-You need Docker. Nothing else.
+Il faut seulement Docker.
 
 ```bash
 docker compose up --build
 ```
 
-Open **http://localhost:8080**. The first start also imports the events (about 30 seconds). The database admin UI is at http://localhost:8081.
+Ouvrez **http://localhost:8080**. Au premier démarrage, les événements sont importés (environ 30 secondes). L'interface d'administration de la base est sur http://localhost:8081.
 
-## The interesting part: two people, one last seat
+## Le point technique central : deux personnes, une dernière place
 
-When two people reserve the last seat at the same instant, exactly one gets it. Never both.
+Quand deux personnes réservent la dernière place au même instant, **une seule** l'obtient. Jamais les deux.
 
-Watch it happen. This creates a 10-seat event and fires 100 simultaneous requests at it:
+Pour le voir en direct, ce script crée un événement de 10 places et lui envoie 100 demandes simultanées :
 
 ```bash
 cd backend
 uv run python -m app.demo.race
 ```
 
-The demo event is deleted afterwards, so it never appears in the real list.
+L'événement de démonstration est supprimé à la fin : il n'apparaît jamais dans la vraie liste.
 
 ```
 answered in 0.98s: {'booked': 10, 'sold_out': 90}
@@ -44,67 +44,73 @@ serialization conflicts retried by the server: 13
 RESULT: no overbooking
 ```
 
-How it works, in one line: **one atomic `UPDATE ... WHERE seats_taken < capacity`, inside a serializable CockroachDB transaction, with automatic retry.** The full explanation, with diagrams, is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#4-the-hard-part-two-people-one-last-seat).
+Le principe en une phrase : **une seule requête `UPDATE ... WHERE seats_taken < capacity`, atomique, dans une transaction sérialisable CockroachDB, avec nouvelle tentative automatique.** L'explication complète, avec schémas, est dans [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#4-le-point-difficile--deux-personnes-une-dernière-place).
 
-## Stack
+## Technologies
 
-| Layer | Choice | Why (short) |
+| Couche | Choix | Pourquoi (en bref) |
 |---|---|---|
-| Database | **CockroachDB** | Serializable transactions by default and PostgreSQL SQL. Cassandra was rejected: eventual consistency makes correct booking harder. |
-| Backend | **FastAPI** (Python 3.12, async) | Typed, fast to write, auto API docs at `/docs`. |
-| Python tooling | **uv** | One fast tool for Python, venv and a lockfile. Reproducible installs. |
-| Frontend | **React + Vite + TypeScript** | A SPA is enough here (no login, no SEO need). |
-| Data fetching | TanStack Query | Caching and cancellation without hand-written effects. |
-| Languages | Small typed FR/EN layer (no library) | Missing translations fail at compile time. See [decisions](docs/DECISIONS.md#11-translations-french-and-english-with-a-small-typed-layer). |
-| Map | Leaflet + OpenStreetMap | Free, no API key. |
-| Delivery | Docker Compose, GitHub Actions | One command to run. CI tests against a real CockroachDB. |
+| Base de données | **CockroachDB** | Transactions sérialisables par défaut et SQL compatible PostgreSQL. |
+| Backend | **FastAPI** (Python 3.12, asynchrone) | Typé, rapide à écrire, documentation d'API automatique sur `/docs`. |
+| Outil Python | **uv** | Un seul outil rapide pour Python, l'environnement et le fichier de verrouillage. Installations reproductibles. |
+| Frontend | **React + Vite + TypeScript** | Une application monopage suffit ici (pas de compte, pas de besoin de référencement). |
+| Données côté client | TanStack Query | Cache et annulation de requêtes sans effets écrits à la main. |
+| Langues | Petite couche FR/EN typée (sans bibliothèque) | Une traduction manquante empêche la compilation. Voir les [décisions](docs/DECISIONS.md#11-traductions--français-et-anglais-avec-une-petite-couche-typée). |
+| Design | CSS simple avec variables, Plus Jakarta Sans et Newsreader | Maquette créée avec Google Stitch, reconstruite en composants réutilisables. Voir les [décisions](docs/DECISIONS.md#12-design-visuel-issu-de-google-stitch-reconstruit-en-composants). |
+| Carte | Leaflet + OpenStreetMap | Gratuit, sans clé d'API. |
+| Livraison | Docker Compose, GitHub Actions | Une commande pour lancer. La CI teste contre une vraie CockroachDB. |
 
-Every choice, and what it cost, is in [docs/DECISIONS.md](docs/DECISIONS.md).
+Chaque choix, et ce qu'il coûte, est expliqué dans [docs/DECISIONS.md](docs/DECISIONS.md).
 
-## Develop
+## Développer
 
 ```bash
-docker compose up -d cockroach          # the database only
+docker compose up -d cockroach          # la base de données seule
 
 cd backend
-uv sync                                 # install exactly what uv.lock says
-uv run uvicorn app.main:app --reload    # API on :8000, docs on /docs
-uv run python -m app.ingest             # import events
-uv run pytest                           # 27 tests, real database
+uv sync                                 # installe exactement ce que dit uv.lock
+uv run uvicorn app.main:app --reload    # API sur :8000, documentation sur /docs
+uv run python -m app.ingest             # importe les événements
+uv run pytest                           # 27 tests, vraie base de données
 uv run ruff check . && uv run ruff format --check .
 
 cd frontend
 npm install
-npm run dev                             # :5173, proxies /api to :8000
+npm run dev                             # :5173, redirige /api vers :8000
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-Windows note: psycopg's async mode needs a selector event loop. `--reload` provides one. Without it on Windows, use Docker or WSL. (Linux, macOS and Docker are unaffected.)
+Note Windows : le mode asynchrone de psycopg a besoin d'une boucle d'événements de type « selector ». `--reload` en fournit une. Sans `--reload` sous Windows, utilisez Docker ou WSL. (Linux, macOS et Docker ne sont pas concernés.)
 
-## Project layout
+## Organisation du dépôt
 
 ```
 backend/app/
-  events/      search: router, SQL repository, schemas
-  bookings/    reservation: the concurrency-critical code
-  ingest/      Paris Open Data client, normalisation (pure functions), upsert
-  db.py        connection pool + transaction retry
-  schema.sql   tables and the constraints that protect reservations
-backend/tests/ 27 tests: normalisation, search, booking, concurrency
-frontend/src/  api/, hooks/, components/, i18n/ (FR and EN text), lib/ (pure, tested), styles/
-docs/          ARCHITECTURE.md (system design), DECISIONS.md
-.claude/skills project rules for AI-assisted work (see below)
+  events/      recherche : routeur, requêtes SQL, schémas
+  bookings/    réservation : le code critique pour la concurrence
+  ingest/      client Paris Data, normalisation (fonctions pures), insertion
+  db.py        pool de connexions + nouvelle tentative des transactions
+  schema.sql   tables et contraintes qui protègent les réservations
+backend/tests/ 27 tests : normalisation, recherche, réservation, concurrence
+frontend/src/
+  components/  ui/ (briques réutilisables), layout/, filters/, events/, drawer/, map/
+  hooks/       données et état (URL, géolocalisation)
+  i18n/        textes FR et EN
+  lib/         fonctions pures et testées
+  styles/      variables de design (tokens) et styles de base
+docs/          ARCHITECTURE.md (conception du système), DECISIONS.md
+.claude/skills règles du projet pour le travail assisté par IA (voir plus bas)
 ```
 
-## What is real, and what is not
+## Ce qui est réel, et ce qui ne l'est pas
 
-- **Real:** events, dates, venues, prices, coordinates and images come from Paris Open Data. Event titles and descriptions are published in French, so they stay in French even in the English interface.
-- **Not real:** seat capacity. The open data has none, so each event gets a stable fake capacity (20 to 200). Reservations demonstrate correct concurrency, they are not real ticketing. There is no login: a reservation is identified by email only.
+- **Réel :** les événements, dates, lieux, prix, coordonnées et images viennent de Paris Data. Les titres et descriptions sont publiés en français : ils restent en français, même dans l'interface anglaise.
+- **Fictif :** la capacité des salles. Les données ouvertes n'en contiennent pas, donc chaque événement reçoit une capacité fictive mais stable (20 à 200). Les réservations servent à démontrer une gestion correcte de la concurrence : ce n'est pas une vraie billetterie. Il n'y a pas de connexion : une réservation est identifiée par son e-mail seulement.
 
-## Next steps
+## Pistes d'amélioration
 
-Authentication and email verification, cancelling a reservation, scheduled re-ingestion, a Playwright test of the booking flow, generated API types, keyset pagination, and sharding the seat counter for very hot events. See [architecture section 7](docs/ARCHITECTURE.md#7-how-this-scales-and-what-breaks-first).
+Authentification et vérification de l'e-mail, annulation d'une réservation, import planifié, test Playwright du parcours de réservation, types d'API générés, pagination par curseur, et compteur de places réparti pour les événements très demandés. Voir la [section 7 de l'architecture](docs/ARCHITECTURE.md#7-passage-à-léchelle-et-ce-qui-casse-en-premier).
 
-## How I used AI
+## Comment j'ai utilisé l'IA
 
-I built this with an AI coding assistant, and I steered it with written rules rather than ad-hoc prompts. The `.claude/skills/` folder holds the project's standards (concurrency rules, backend and frontend conventions, design system, git and docs style) and `CLAUDE.md` holds the overview. That kept the output consistent and reviewable. I tested everything against the real database and the real API, and checked the UI in a browser. I can explain every decision above.
+J'ai construit ce projet avec un assistant de programmation basé sur l'IA, et je l'ai guidé avec des règles écrites plutôt qu'avec des demandes au coup par coup. Le dossier `.claude/skills/` contient les standards du projet (concurrence, conventions backend et frontend, design, git et documentation) et `CLAUDE.md` en donne la vue d'ensemble. Cela a gardé le résultat cohérent et relisible. J'ai tout testé contre la vraie base de données et la vraie API, et vérifié l'interface dans un navigateur. Je peux expliquer chaque décision ci-dessus.

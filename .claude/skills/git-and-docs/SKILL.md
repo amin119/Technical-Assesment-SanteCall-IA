@@ -20,10 +20,11 @@ description: Commit conventions, CI expectations and documentation style. Use wh
 - A change to CI must be runnable locally with the commands above.
 
 ## Docs
-Reader: a smart engineer who has never seen this repo and has 5 minutes.
+Reader: a smart engineer who has never seen this repo and has 5 minutes (French speaker).
 - Lead with what it does and how to run it.
 - Short sentences. Define a term the first time it appears. Prefer a table or diagram to a paragraph.
 - Always answer "why this choice, and what did we reject?". That is what an interview probes.
 - Be honest about limits. Never state a number you did not measure.
 - Update `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` in the same commit as the change they describe.
-- Docs are English. The product UI is French.
+- Project docs (`README.md`, `docs/`, the package READMEs) are written in **French**, in simple words. Code, comments, commit
+  messages and the `.claude/skills/` files stay in **English**. The product UI is bilingual (French and English).

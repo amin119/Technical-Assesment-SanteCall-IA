@@ -39,7 +39,7 @@ goal, Next.js is the natural migration (listed in the roadmap).
   Never write `'fr-FR'` or `toLocaleString()` in a component.
 - Event titles and descriptions come from Paris Open Data in French: render them with `lang="fr"`, do not translate them.
 - Show server errors by their `code` mapped to a translated message, never the API's English `message`.
-- Code, comments and docs are English.
+- Code and comments are English. Project docs (README, `docs/`) are French.
 
 ## Gotchas
 - **Keep render pure.** No `new Date()` or `Date.now()` during render (oxlint flags it). The URL-state
