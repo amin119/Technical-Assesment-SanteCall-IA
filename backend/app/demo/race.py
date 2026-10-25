@@ -1,7 +1,9 @@
-"""Live demo of the concurrency guarantee.   uv run python -m app.demo.race
+"""Live demo of the concurrency guarantee.   uv run python -m app.demo.race [API_URL] [--keep]
 
 Creates a 10-seat event, then fires 100 reservation requests at the running API at the same time.
 Expected: exactly 10 succeed, 90 get "sold_out", and the database agrees.
+The demo event is deleted afterwards so it never shows up in the real event list (use --keep to
+leave it in place and look at it in the UI).
 """
 
 import asyncio
@@ -16,7 +18,9 @@ from app.db import init_schema, make_pool
 from app.ingest.normalize import normalize_record
 from app.ingest.runner import upsert_events
 
-API = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+API = ARGS[0] if ARGS else "http://localhost:8000"
+KEEP = "--keep" in sys.argv
 SEATS, BUYERS = 10, 100
 
 
@@ -66,6 +70,8 @@ async def main() -> None:
             (event_id,),
         )
         db = await cur.fetchone()
+        if not KEEP:
+            await conn.execute("DELETE FROM events WHERE id = %s", (event_id,))  # bookings cascade
     await pool.close()
 
     print(f"\n  answered in {elapsed:.2f}s: {dict(outcome)}")
