@@ -11,16 +11,24 @@ jobs:
     defaults:
       run:
         working-directory: backend
-    # A real CockroachDB, because the tests check real transaction behaviour.
-    services:
-      cockroach:
-        image: cockroachdb/cockroach:v25.4.18
-        ports: ["26257:26257"]
-        options: >-
-          --health-cmd "cockroach sql --insecure -e 'SELECT 1'"
-          --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
       - uses: actions/checkout@v4
+      # A real CockroachDB, because the tests check real transaction behaviour.
+      # Started by hand, not with `services:`: that block cannot pass a command, and this image
+      # needs `start-single-node --insecure` (without it the container exits immediately).
+      - name: Start CockroachDB
+        run: |
+          docker run -d --name cockroach -p 26257:26257 cockroachdb/cockroach:v25.4.18 \
+            start-single-node --insecure --store=type=mem,size=25%
+          for i in $(seq 1 30); do
+            if docker exec cockroach cockroach sql --insecure -e "SELECT 1" >/dev/null 2>&1; then
+              echo "CockroachDB ready"; exit 0
+            fi
+            sleep 2
+          done
+          docker logs cockroach
+          echo "CockroachDB did not become ready" >&2
+          exit 1
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
