@@ -1,0 +1,203 @@
+// All user-facing text lives here, in French and English.
+//
+// `fr` is the reference. `en` is typed as Record<MessageKey, string>, so TypeScript refuses to
+// compile if a key exists in one language and not the other. A test also checks that the
+// {placeholders} match in both.
+//
+// Plurals use two keys: `name_one` and `name_other` (picked with Intl.PluralRules, see tp()).
+
+export const fr = {
+  'meta.title': 'Sortir — que faire à Paris',
+  'meta.description': 'Concerts, théâtre, expositions, sport : trouvez quoi faire à Paris.',
+  'brand.home': 'Sortir, accueil',
+  'lang.label': 'Langue',
+
+  'hero.before': 'Que faire à Paris ',
+  'hero.after': ' ?',
+  'hero.count_one': '{n} événement',
+  'hero.count_other': '{n} événements',
+
+  'when.group': 'Quand',
+  'when.all': 'Tout',
+  'when.today': "Aujourd'hui",
+  'when.tomorrow': 'Demain',
+  'when.weekend': 'Ce week-end',
+  'when.week': '7 jours',
+  'when.all.phrase': 'en ce moment',
+  'when.today.phrase': "aujourd'hui",
+  'when.tomorrow.phrase': 'demain',
+  'when.weekend.phrase': 'ce week-end',
+  'when.week.phrase': 'cette semaine',
+
+  'filters.searchLabel': 'Rechercher un événement',
+  'filters.searchPlaceholder': 'Un artiste, un lieu, un mot…',
+  'filters.categories': 'Catégories',
+  'filters.free': 'Gratuit',
+  'filters.near': 'Autour de moi',
+  'filters.locating': 'Localisation…',
+  'filters.reset': 'Effacer',
+  'filters.geoError': 'Position indisponible. Autorisez la localisation dans votre navigateur.',
+
+  'cat.concert': 'Concerts',
+  'cat.theatre': 'Théâtre',
+  'cat.spectacle': 'Spectacles',
+  'cat.exposition': 'Expositions',
+  'cat.sport': 'Sport',
+  'cat.cinema': 'Cinéma',
+  'cat.conference': 'Conférences',
+  'cat.famille': 'En famille',
+  'cat.loisirs': 'Ateliers & loisirs',
+  'cat.autre': 'Autres',
+
+  'list.label': 'Événements',
+  'list.loading': 'Chargement des événements',
+  'list.more': 'Voir plus',
+  'list.loadingMore': 'Chargement…',
+
+  'state.listError': 'Impossible de charger les événements.',
+  'state.retry': 'Réessayer',
+  'state.empty': 'Rien ne correspond à ces filtres.',
+  'state.clear': 'Effacer les filtres',
+
+  'map.label': 'Carte',
+  'view.map': 'Carte',
+  'view.list': 'Liste',
+
+  'footer.note':
+    'Données : Paris Data, « Que faire à Paris ». Les places et réservations sont une démonstration technique : les capacités sont fictives.',
+
+  'row.until': 'jusqu’au',
+  'price.free': 'Gratuit',
+  'price.paid': 'Payant',
+  'price.onsite': 'Tarif sur place',
+  'seats.full': 'Complet',
+  'seats.few_one': 'Plus que {n} place',
+  'seats.few_other': 'Plus que {n} places',
+  'seats.many_one': '{n} place',
+  'seats.many_other': '{n} places',
+
+  'drawer.close': 'Fermer',
+  'drawer.label': 'Détail de l’événement',
+  'drawer.loadError': 'Impossible de charger cet événement.',
+  'drawer.when': 'Quand',
+  'drawer.where': 'Où',
+  'drawer.price': 'Tarif',
+  'drawer.reservation': 'Réservation',
+  'drawer.source': 'Voir la fiche sur paris.fr ↗',
+
+  'meter.full': 'Complet',
+  'meter.left_one': 'place restante sur {capacity}',
+  'meter.left_other': 'places restantes sur {capacity}',
+
+  'booking.email': 'Votre e-mail',
+  'booking.placeholder': 'vous@exemple.fr',
+  'booking.submit': 'Réserver',
+  'booking.pending': 'Réservation…',
+  'booking.full': 'Complet',
+  'booking.done': 'Place réservée.',
+  'booking.doneFor': 'Au nom de {email}.',
+  'booking.error.sold_out': 'Complet : quelqu’un a réservé la dernière place juste avant vous.',
+  'booking.error.already_booked': 'Vous avez déjà une place pour cet événement.',
+  'booking.error.busy': 'Beaucoup de monde réserve en ce moment. Réessayez dans un instant.',
+  'booking.error.validation_error': 'Cette adresse e-mail ne semble pas valide.',
+  'booking.error.generic': 'Réservation impossible pour le moment.',
+}
+
+export type MessageKey = keyof typeof fr
+
+export const en: Record<MessageKey, string> = {
+  'meta.title': 'Sortir — what to do in Paris',
+  'meta.description': 'Concerts, theatre, exhibitions, sport: find something to do in Paris.',
+  'brand.home': 'Sortir, home',
+  'lang.label': 'Language',
+
+  'hero.before': 'What to do in Paris ',
+  'hero.after': '?',
+  'hero.count_one': '{n} event',
+  'hero.count_other': '{n} events',
+
+  'when.group': 'When',
+  'when.all': 'All',
+  'when.today': 'Today',
+  'when.tomorrow': 'Tomorrow',
+  'when.weekend': 'This weekend',
+  'when.week': 'Next 7 days',
+  'when.all.phrase': 'right now',
+  'when.today.phrase': 'today',
+  'when.tomorrow.phrase': 'tomorrow',
+  'when.weekend.phrase': 'this weekend',
+  'when.week.phrase': 'this week',
+
+  'filters.searchLabel': 'Search events',
+  'filters.searchPlaceholder': 'An artist, a venue, a word…',
+  'filters.categories': 'Categories',
+  'filters.free': 'Free',
+  'filters.near': 'Near me',
+  'filters.locating': 'Locating…',
+  'filters.reset': 'Clear',
+  'filters.geoError': 'Location unavailable. Allow location access in your browser.',
+
+  'cat.concert': 'Concerts',
+  'cat.theatre': 'Theatre',
+  'cat.spectacle': 'Shows',
+  'cat.exposition': 'Exhibitions',
+  'cat.sport': 'Sport',
+  'cat.cinema': 'Cinema',
+  'cat.conference': 'Talks',
+  'cat.famille': 'Family',
+  'cat.loisirs': 'Workshops & leisure',
+  'cat.autre': 'Other',
+
+  'list.label': 'Events',
+  'list.loading': 'Loading events',
+  'list.more': 'Show more',
+  'list.loadingMore': 'Loading…',
+
+  'state.listError': 'Couldn’t load events.',
+  'state.retry': 'Try again',
+  'state.empty': 'Nothing matches these filters.',
+  'state.clear': 'Clear filters',
+
+  'map.label': 'Map',
+  'view.map': 'Map',
+  'view.list': 'List',
+
+  'footer.note':
+    'Data: Paris Data, “Que faire à Paris”. Event titles and descriptions are in French, as published. Seats and reservations are a technical demo: capacities are fictional.',
+
+  'row.until': 'until',
+  'price.free': 'Free',
+  'price.paid': 'Paid',
+  'price.onsite': 'Price on site',
+  'seats.full': 'Sold out',
+  'seats.few_one': 'Only {n} seat left',
+  'seats.few_other': 'Only {n} seats left',
+  'seats.many_one': '{n} seat',
+  'seats.many_other': '{n} seats',
+
+  'drawer.close': 'Close',
+  'drawer.label': 'Event details',
+  'drawer.loadError': 'Couldn’t load this event.',
+  'drawer.when': 'When',
+  'drawer.where': 'Where',
+  'drawer.price': 'Price',
+  'drawer.reservation': 'Reservation',
+  'drawer.source': 'View on paris.fr ↗',
+
+  'meter.full': 'Sold out',
+  'meter.left_one': 'seat left of {capacity}',
+  'meter.left_other': 'seats left of {capacity}',
+
+  'booking.email': 'Your email',
+  'booking.placeholder': 'you@example.com',
+  'booking.submit': 'Reserve',
+  'booking.pending': 'Reserving…',
+  'booking.full': 'Sold out',
+  'booking.done': 'Seat reserved.',
+  'booking.doneFor': 'Booked for {email}.',
+  'booking.error.sold_out': 'Sold out: someone took the last seat just before you.',
+  'booking.error.already_booked': 'You already have a seat for this event.',
+  'booking.error.busy': 'Lots of people are booking right now. Try again in a moment.',
+  'booking.error.validation_error': 'This email address doesn’t look valid.',
+  'booking.error.generic': 'Booking isn’t possible right now.',
+}

@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { WHEN_OPTIONS, type When } from '../lib/filters'
+import { useI18n } from '../i18n/useI18n'
+import type { When } from '../lib/filters'
 import { formatCount, formatLongDate } from '../lib/format'
 
 interface Props {
@@ -10,12 +11,13 @@ interface Props {
 
 /** The headline rewrites itself when the date filter changes: the filter is part of the sentence. */
 export function Hero({ when, total, now }: Props) {
-  const phrase = WHEN_OPTIONS.find((o) => o.value === when)?.phrase ?? ''
+  const { t, tp, lang } = useI18n()
+  const phrase = t(`when.${when}.phrase`)
   return (
     <section className="hero">
-      <p className="hero__date">{formatLongDate(new Date(now))}</p>
+      <p className="hero__date">{formatLongDate(new Date(now), lang)}</p>
       <h1 className="hero__title">
-        Que faire à Paris{' '}
+        {t('hero.before')}
         <span className="hero__swap">
           <AnimatePresence mode="wait" initial={false}>
             <motion.em
@@ -29,10 +31,10 @@ export function Hero({ when, total, now }: Props) {
             </motion.em>
           </AnimatePresence>
         </span>
-        &nbsp;?
+        {t('hero.after')}
       </h1>
       <p className="hero__count" aria-live="polite">
-        {total === undefined ? ' ' : `${formatCount(total)} événement${total > 1 ? 's' : ''}`}
+        {total === undefined ? ' ' : tp('hero.count', total, { n: formatCount(total, lang) })}
       </p>
     </section>
   )

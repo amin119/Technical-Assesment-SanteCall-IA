@@ -2,13 +2,8 @@
 
 export type When = 'all' | 'today' | 'tomorrow' | 'weekend' | 'week'
 
-export const WHEN_OPTIONS: { value: When; label: string; phrase: string }[] = [
-  { value: 'all', label: 'Tout', phrase: 'en ce moment' },
-  { value: 'today', label: "Aujourd'hui", phrase: "aujourd'hui" },
-  { value: 'tomorrow', label: 'Demain', phrase: 'demain' },
-  { value: 'weekend', label: 'Ce week-end', phrase: 'ce week-end' },
-  { value: 'week', label: '7 jours', phrase: 'cette semaine' },
-]
+// Labels live in i18n/messages.ts (`when.<value>` and `when.<value>.phrase`).
+export const WHEN_VALUES: When[] = ['all', 'today', 'tomorrow', 'weekend', 'week']
 
 export interface Filters {
   q: string
@@ -22,7 +17,7 @@ export const DEFAULT_FILTERS: Filters = { q: '', when: 'all', categories: [], fr
 
 export const NEAR_RADIUS_KM = 3
 
-const WHENS = new Set<string>(WHEN_OPTIONS.map((o) => o.value))
+const WHENS = new Set<string>(WHEN_VALUES)
 
 /** Read the page URL. Unknown or malformed values fall back to defaults instead of throwing. */
 export function parseSearch(search: string): { filters: Filters; eventId: string | null } {

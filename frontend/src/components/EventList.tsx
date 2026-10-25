@@ -1,19 +1,22 @@
 import { motion } from 'motion/react'
 import type { EventSummary } from '../api/types'
-import { dateBlock, priceLabel, seatsLabel } from '../lib/format'
+import { useI18n } from '../i18n/useI18n'
+import { arrondissementLabel, categoryLabel, dateBlock, priceLabel, seatsLabel } from '../lib/format'
 
 interface RowProps {
   event: EventSummary
   index: number
+  now: number
   selected: boolean
   hovered: boolean
   onSelect: (id: string) => void
   onHover: (id: string | null) => void
 }
 
-function EventRow({ event, index, selected, hovered, onSelect, onHover }: RowProps) {
-  const date = dateBlock(event)
-  const place = [event.venue_name, event.arrondissement ? `${event.arrondissement}${event.arrondissement === 1 ? 'er' : 'e'}` : null]
+function EventRow({ event, index, now, selected, hovered, onSelect, onHover }: RowProps) {
+  const i18n = useI18n()
+  const date = dateBlock(event, new Date(now), i18n)
+  const place = [event.venue_name, event.arrondissement ? arrondissementLabel(event.arrondissement, i18n.lang) : null]
     .filter(Boolean)
     .join(' · ')
   return (
@@ -38,16 +41,23 @@ function EventRow({ event, index, selected, hovered, onSelect, onHover }: RowPro
         </span>
         <span className="row__body">
           <span className="row__meta">
-            {event.category_label}
+            {categoryLabel(event.category, event.category_label, i18n)}
             {place && ` · ${place}`}
           </span>
-          <span className="row__title">{event.title}</span>
-          {event.summary && <span className="row__summary">{event.summary}</span>}
+          {/* Titles and summaries come from Paris Open Data and are published in French. */}
+          <span className="row__title" lang="fr">
+            {event.title}
+          </span>
+          {event.summary && (
+            <span className="row__summary" lang="fr">
+              {event.summary}
+            </span>
+          )}
         </span>
         <span className="row__aside">
-          <span className={event.is_free ? 'row__price is-free' : 'row__price'}>{priceLabel(event)}</span>
+          <span className={event.is_free ? 'row__price is-free' : 'row__price'}>{priceLabel(event, i18n)}</span>
           <span className={event.seats_left <= 3 ? 'row__seats is-low' : 'row__seats'}>
-            {seatsLabel(event.seats_left, event.capacity)}
+            {seatsLabel(event.seats_left, event.capacity, i18n)}
           </span>
           {event.distance_km !== null && <span className="row__seats">{event.distance_km.toFixed(1)} km</span>}
         </span>
@@ -58,6 +68,7 @@ function EventRow({ event, index, selected, hovered, onSelect, onHover }: RowPro
 
 interface ListProps {
   events: EventSummary[]
+  now: number
   selectedId: string | null
   hoveredId: string | null
   hasMore: boolean
@@ -67,7 +78,8 @@ interface ListProps {
   onMore: () => void
 }
 
-export function EventList({ events, selectedId, hoveredId, hasMore, loadingMore, onSelect, onHover, onMore }: ListProps) {
+export function EventList({ events, now, selectedId, hoveredId, hasMore, loadingMore, onSelect, onHover, onMore }: ListProps) {
+  const { t } = useI18n()
   return (
     <>
       <ul className="list">
@@ -76,6 +88,7 @@ export function EventList({ events, selectedId, hoveredId, hasMore, loadingMore,
             key={e.id}
             event={e}
             index={i}
+            now={now}
             selected={e.id === selectedId}
             hovered={e.id === hoveredId}
             onSelect={onSelect}
@@ -85,7 +98,7 @@ export function EventList({ events, selectedId, hoveredId, hasMore, loadingMore,
       </ul>
       {hasMore && (
         <button type="button" className="more" onClick={onMore} disabled={loadingMore}>
-          {loadingMore ? 'Chargement…' : 'Voir plus'}
+          {loadingMore ? t('list.loadingMore') : t('list.more')}
         </button>
       )}
     </>
@@ -93,8 +106,9 @@ export function EventList({ events, selectedId, hoveredId, hasMore, loadingMore,
 }
 
 export function ListSkeleton() {
+  const { t } = useI18n()
   return (
-    <ul className="list" aria-busy="true" aria-label="Chargement des événements">
+    <ul className="list" aria-busy="true" aria-label={t('list.loading')}>
       {Array.from({ length: 7 }, (_, i) => (
         <li key={i} className="row row--skeleton" aria-hidden="true">
           <span className="sk sk--date" />

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { createTranslator } from '../i18n/translator'
 import { dateBlock, seatsLabel } from './format'
 import { DEFAULT_FILTERS, isDefault, parseSearch, toApiParams, toSearch, whenToRange } from './filters'
 
 // 2026-10-24 is a Saturday; 2026-10-21 a Wednesday; 2026-10-25 a Sunday.
 const saturday = new Date(2026, 9, 24, 14, 0)
 const wednesday = new Date(2026, 9, 21, 10, 0)
+const fr = createTranslator('fr')
 const sunday = new Date(2026, 9, 25, 9, 0)
 
 describe('whenToRange', () => {
@@ -79,19 +81,19 @@ describe('toApiParams', () => {
 
 describe('format', () => {
   it('shows an end date for events that started on an earlier day', () => {
-    const block = dateBlock({ starts_at: '2026-09-01T08:00:00Z', ends_at: '2026-12-31T22:00:00Z' }, saturday)
+    const block = dateBlock({ starts_at: '2026-09-01T08:00:00Z', ends_at: '2026-12-31T22:00:00Z' }, saturday, fr)
     expect(block.top).toBe('jusqu’au')
     expect(block.big).toBe('31')
   })
 
   it('shows the start date for upcoming events', () => {
-    const block = dateBlock({ starts_at: '2026-11-07T19:00:00Z', ends_at: '2026-11-07T21:00:00Z' }, saturday)
+    const block = dateBlock({ starts_at: '2026-11-07T19:00:00Z', ends_at: '2026-11-07T21:00:00Z' }, saturday, fr)
     expect(block.big).toBe('7')
   })
 
   it('warns when few seats are left', () => {
-    expect(seatsLabel(0, 100)).toBe('Complet')
-    expect(seatsLabel(2, 100)).toBe('Plus que 2 places')
-    expect(seatsLabel(60, 100)).toBe('60 places')
+    expect(seatsLabel(0, 100, fr)).toBe('Complet')
+    expect(seatsLabel(2, 100, fr)).toBe('Plus que 2 places')
+    expect(seatsLabel(60, 100, fr)).toBe('60 places')
   })
 })

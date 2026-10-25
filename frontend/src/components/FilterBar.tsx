@@ -1,8 +1,9 @@
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import type { CategoryCount } from '../api/types'
-import { WHEN_OPTIONS, type Filters } from '../lib/filters'
-import { formatCount } from '../lib/format'
+import { useI18n } from '../i18n/useI18n'
+import { WHEN_VALUES, type Filters } from '../lib/filters'
+import { categoryLabel, formatCount } from '../lib/format'
 
 interface Props {
   filters: Filters
@@ -16,6 +17,9 @@ interface Props {
 }
 
 export function FilterBar({ filters, categories, canReset, locating, geoError, onChange, onLocate, onReset }: Props) {
+  const i18n = useI18n()
+  const { t, lang } = i18n
+
   // The input keeps its own text and reports it 300 ms after the last keystroke,
   // so typing does not fire one request per letter.
   const [text, setText] = useState(filters.q)
@@ -53,26 +57,26 @@ export function FilterBar({ filters, categories, canReset, locating, geoError, o
             <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
             <path d="m13 13 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <span className="sr-only">Rechercher un événement</span>
+          <span className="sr-only">{t('filters.searchLabel')}</span>
           <input
             type="search"
             value={text}
             onChange={(e) => onType(e.target.value)}
-            placeholder="Un artiste, un lieu, un mot…"
+            placeholder={t('filters.searchPlaceholder')}
           />
         </label>
 
-        <div className="when" role="group" aria-label="Quand">
-          {WHEN_OPTIONS.map((o) => (
+        <div className="when" role="group" aria-label={t('when.group')}>
+          {WHEN_VALUES.map((value) => (
             <button
-              key={o.value}
+              key={value}
               type="button"
               className="when__tab"
-              aria-pressed={filters.when === o.value}
-              onClick={() => onChange({ when: o.value })}
+              aria-pressed={filters.when === value}
+              onClick={() => onChange({ when: value })}
             >
-              {o.label}
-              {filters.when === o.value && (
+              {t(`when.${value}`)}
+              {filters.when === value && (
                 <motion.span
                   layoutId="when-underline"
                   className="when__line"
@@ -85,7 +89,7 @@ export function FilterBar({ filters, categories, canReset, locating, geoError, o
       </div>
 
       <div className="filters__row filters__row--wrap">
-        <div className="cats" role="group" aria-label="Catégories">
+        <div className="cats" role="group" aria-label={t('filters.categories')}>
           {categories?.map((c) => {
             const active = filters.categories.includes(c.slug)
             return (
@@ -97,8 +101,8 @@ export function FilterBar({ filters, categories, canReset, locating, geoError, o
                 disabled={!active && c.count === 0}
                 onClick={() => toggleCategory(c.slug)}
               >
-                {c.label}
-                <sup>{formatCount(c.count)}</sup>
+                {categoryLabel(c.slug, c.label, i18n)}
+                <sup>{formatCount(c.count, lang)}</sup>
               </button>
             )
           })}
@@ -106,21 +110,21 @@ export function FilterBar({ filters, categories, canReset, locating, geoError, o
 
         <div className="toggles">
           <button type="button" className="toggle" aria-pressed={filters.free} onClick={() => onChange({ free: !filters.free })}>
-            Gratuit
+            {t('filters.free')}
           </button>
           <button type="button" className="toggle" aria-pressed={filters.near !== null} onClick={onLocate} disabled={locating}>
-            {locating ? 'Localisation…' : 'Autour de moi'}
+            {locating ? t('filters.locating') : t('filters.near')}
           </button>
           {canReset && (
             <button type="button" className="toggle toggle--link" onClick={onReset}>
-              Effacer
+              {t('filters.reset')}
             </button>
           )}
         </div>
       </div>
       {geoError && (
         <p className="filters__note" role="status">
-          Position indisponible. Autorisez la localisation dans votre navigateur.
+          {t('filters.geoError')}
         </p>
       )}
     </div>

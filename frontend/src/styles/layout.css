@@ -1,6 +1,48 @@
 /* Masthead and hero */
 .masthead {
   padding-block: 22px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* FR | EN */
+.lang {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.lang__item {
+  display: flex;
+  align-items: center;
+}
+
+.lang__sep {
+  width: 1px;
+  height: 12px;
+  background: var(--ink-2);
+  margin-inline: 10px;
+}
+
+.lang__btn {
+  padding: 6px 0;
+  color: var(--ink-2);
+  transition: color 0.2s;
+}
+
+.lang__btn:hover,
+.lang__btn[aria-pressed='true'] {
+  color: var(--ink);
+}
+
+.lang__btn[aria-pressed='true'] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 
 .wordmark {
